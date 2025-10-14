@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.monitor.mapper.MonitorConfigMapper">
+
+    <resultMap type="com.ruoyi.monitor.domain.MonitorConfig" id="MonitorConfigResult">
+        <result property="configId"     column="config_id"     />
+        <result property="configKey"    column="config_key"    />
+        <result property="configName"   column="config_name"   />
+        <result property="configJson"   column="config_json"   />
+        <result property="status"       column="status"        />
+        <result property="remark"       column="remark"        />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="delFlag"      column="del_flag"      />
+    </resultMap>
+
+    <sql id="selectMonitorConfigVo">
+        select config_id, config_key, config_name, config_json, status, remark,
+               create_by, create_time, update_by, update_time, del_flag
+        from monitor_config
+    </sql>
+
+    <!-- 根据ID查询监控配置 -->
+    <select id="selectById" parameterType="Long" resultMap="MonitorConfigResult">
+        <include refid="selectMonitorConfigVo"/>
+        where config_id = #{configId} and del_flag = '0'
+    </select>
+
+    <!-- 根据配置KEY查询监控配置 -->
+    <select id="selectMonitorConfigByConfigKey" parameterType="String" resultMap="MonitorConfigResult">
+        <include refid="selectMonitorConfigVo"/>
+        where config_key = #{configKey} and del_flag = '0'
+    </select>
+
+    <!-- 查询监控配置列表 -->
+    <select id="selectList" parameterType="com.ruoyi.monitor.domain.MonitorConfig" resultMap="MonitorConfigResult">
+        <include refid="selectMonitorConfigVo"/>
+        <where>
+            del_flag = '0'
+            <if test="configKey != null and configKey != ''">
+                and config_key like concat('%', #{configKey}, '%')
+            </if>
+            <if test="configName != null and configName != ''">
+                and config_name like concat('%', #{configName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <!-- 新增监控配置 -->
+    <insert id="insert" parameterType="com.ruoyi.monitor.domain.MonitorConfig" useGeneratedKeys="true" keyProperty="configId">
+        insert into monitor_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="configKey != null and configKey != ''">config_key,</if>
+            <if test="configName != null and configName != ''">config_name,</if>
+            <if test="configJson != null and configJson != ''">config_json,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="configKey != null and configKey != ''">#{configKey},</if>
+            <if test="configName != null and configName != ''">#{configName},</if>
+            <if test="configJson != null and configJson != ''">#{configJson},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+        </trim>
+    </insert>
+
+    <!-- 修改监控配置 -->
+    <update id="updateById" parameterType="com.ruoyi.monitor.domain.MonitorConfig">
+        update monitor_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="configKey != null and configKey != ''">config_key = #{configKey},</if>
+            <if test="configName != null and configName != ''">config_name = #{configName},</if>
+            <if test="configJson != null and configJson != ''">config_json = #{configJson},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where config_id = #{configId}
+    </update>
+
+    <!-- 删除监控配置（逻辑删除） -->
+    <update id="deleteById" parameterType="Long">
+        update monitor_config set del_flag = '2' where config_id = #{configId}
+    </update>
+
+    <!-- 批量删除监控配置（逻辑删除） -->
+    <update id="deleteBatchIds">
+        update monitor_config set del_flag = '2' where config_id in
+        <foreach item="configId" collection="configIds" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </update>
+
+    <!-- 校验配置KEY是否唯一 -->
+    <select id="checkConfigKeyUnique" resultMap="MonitorConfigResult">
+        <include refid="selectMonitorConfigVo"/>
+        where config_key = #{configKey}
+          and del_flag = '0'
+        <if test="configId != null">
+          and config_id != #{configId}
+        </if>
+        limit 1
+    </select>
+
+</mapper>
+

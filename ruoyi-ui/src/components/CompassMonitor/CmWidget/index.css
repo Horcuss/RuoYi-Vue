@@ -1,0 +1,20 @@
+.cm-widget_wrapper {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+}
+
+.cm-widget {
+  width: 100%;
+}
+
+.cm-widget-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  justify-content: end;
+}
+
+.cm-widget-buttons .el-button {
+  white-space: nowrap;
+}
