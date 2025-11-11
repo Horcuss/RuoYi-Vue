@@ -98,6 +98,26 @@
               </el-form-item>
             </el-col>
           </el-row>
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <el-form-item label="加工条件Group">
+                <el-select v-model="monitorForm.procConditionGroup" placeholder="请选择" style="width: 100%;">
+                  <el-option label="01-非GP项目" value="01"></el-option>
+                  <el-option label="02-GP项目" value="02"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="大分类CD">
+                <el-input v-model="monitorForm.majorClassCd" placeholder="如：001"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="中分类CD">
+                <el-input v-model="monitorForm.minorClassCd" placeholder="如：N01"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
         </el-card>
 
         <!-- 输入部分配置 -->
@@ -109,17 +129,49 @@
           </div>
           <el-table :data="monitorForm.formItems" border size="small" max-height="300">
             <el-table-column type="index" label="序号" width="60" align="center"></el-table-column>
-            <el-table-column label="中文标签" min-width="150">
+            <el-table-column label="中文标签" min-width="120">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.label" placeholder="如：GP品名"></el-input>
+                <el-input v-model="scope.row.label" placeholder="如：GP品名" size="small"></el-input>
               </template>
             </el-table-column>
-            <el-table-column label="英文字段" min-width="150">
+            <el-table-column label="英文字段" min-width="120">
               <template slot-scope="scope">
-                <el-input v-model="scope.row.prop" placeholder="如：gpName"></el-input>
+                <el-input v-model="scope.row.prop" placeholder="如：gpName" size="small"></el-input>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="80" align="center">
+            <el-table-column label="类型" min-width="100">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.type" placeholder="请选择" size="small" style="width: 100%;">
+                  <el-option label="输入框" value="input"></el-option>
+                  <el-option label="下拉框" value="select"></el-option>
+                </el-select>
+              </template>
+            </el-table-column>
+            <el-table-column label="数据源" min-width="100">
+              <template slot-scope="scope">
+                <el-select
+                  v-model="scope.row.dataSource"
+                  v-if="scope.row.type === 'select'"
+                  placeholder="请选择"
+                  size="small"
+                  style="width: 100%;">
+                  <el-option label="XML" value="xml"></el-option>
+                </el-select>
+                <span v-else style="color: #909399; font-size: 12px;">-</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="表达式" min-width="150">
+              <template slot-scope="scope">
+                <el-input
+                  v-model="scope.row.expression"
+                  v-if="scope.row.type === 'select' && scope.row.dataSource === 'xml'"
+                  placeholder="如：001;2;2"
+                  size="small">
+                </el-input>
+                <span v-else style="color: #909399; font-size: 12px;">-</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="80" align="center" fixed="right">
               <template slot-scope="scope">
                 <el-button size="mini" type="text" icon="el-icon-delete" @click="deleteFormItem(scope.$index)" style="color: #F56C6C;">删除</el-button>
               </template>
@@ -191,8 +243,8 @@
               <template slot-scope="scope">
                 <el-input
                   v-model="scope.row.valueKey"
-                  placeholder="如：avgAge"
-                  v-if="scope.row.dataSource === 'database'"
+                  :placeholder="scope.row.dataSource === 'api' ? '必填，如：deviceTemp' : '如：avgAge'"
+                  v-if="scope.row.dataSource === 'database' || scope.row.dataSource === 'api'"
                 ></el-input>
                 <span v-else style="color: #909399; font-size: 12px;">-</span>
               </template>
@@ -252,8 +304,8 @@
               <template slot-scope="scope">
                 <el-input
                   v-model="scope.row.valueKey"
-                  placeholder="如：avgAge"
-                  v-if="scope.row.dataSource === 'database'"
+                  :placeholder="scope.row.dataSource === 'api' ? '必填，如：deviceTemp' : '如：avgAge'"
+                  v-if="scope.row.dataSource === 'database' || scope.row.dataSource === 'api'"
                 ></el-input>
                 <span v-else style="color: #909399; font-size: 12px;">-</span>
               </template>
@@ -403,8 +455,8 @@
                           <el-form-item label="变量名" label-width="80px">
                             <el-input
                               v-model="row.valueKey"
-                              placeholder="如：avgAge"
-                              v-if="row.dataSource === 'database'"
+                              :placeholder="row.dataSource === 'api' ? '必填，如：deviceTemp' : '如：avgAge'"
+                              v-if="row.dataSource === 'database' || row.dataSource === 'api'"
                               size="small"
                             ></el-input>
                             <span v-else style="color: #909399; font-size: 12px;">-</span>
@@ -473,9 +525,9 @@
                           <template slot-scope="scope">
                             <el-input
                               v-model="scope.row.valueKey"
-                              placeholder="如：avgAge"
+                              :placeholder="scope.row.dataSource === 'api' ? '必填，如：deviceTemp' : '如：avgAge'"
                               size="small"
-                              v-if="scope.row.dataSource === 'database'"
+                              v-if="scope.row.dataSource === 'database' || scope.row.dataSource === 'api'"
                             ></el-input>
                             <span v-else style="color: #909399; font-size: 12px;">-</span>
                           </template>
@@ -664,6 +716,9 @@ export default {
           configKey: response.data.configKey,
           configName: response.data.configName,
           apiUrl: config.apiUrl || '',  // 加载API地址
+          procConditionGroup: config.procConditionGroup || '',  // 加工条件group
+          majorClassCd: config.majorClassCd || '',  // 大分类cd
+          minorClassCd: config.minorClassCd || '',  // 中分类cd
           formItems: config.formItems || [],
           widgetItems: config.widgetItems || [],
           descItems: config.descItems || [],
@@ -708,7 +763,10 @@ export default {
     addFormItem() {
       this.monitorForm.formItems.push({
         label: '',
-        prop: ''
+        prop: '',
+        type: 'input',  // 默认为输入框
+        dataSource: '',
+        expression: ''
       });
     },
 
@@ -892,6 +950,9 @@ export default {
         configKey: '',
         configName: '',
         apiUrl: '',  // 重置API地址
+        procConditionGroup: '',  // 重置加工条件group
+        majorClassCd: '',  // 重置大分类cd
+        minorClassCd: '',  // 重置中分类cd
         formItems: [],
         widgetItems: [],
         descItems: [],
@@ -913,10 +974,61 @@ export default {
         return;
       }
 
+      // 验证API数据源的valueKey必填
+      const validateValueKey = (items, itemType) => {
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.dataSource === 'api' && !item.valueKey) {
+            this.$message.warning(`${itemType}第${i + 1}项：API数据源的变量名不能为空`);
+            return false;
+          }
+        }
+        return true;
+      };
+
+      // 验证descItems
+      if (this.monitorForm.descItems && !validateValueKey(this.monitorForm.descItems, '描述信息')) {
+        return;
+      }
+
+      // 验证remarkItems
+      if (this.monitorForm.remarkItems && !validateValueKey(this.monitorForm.remarkItems, '备注信息')) {
+        return;
+      }
+
+      // 验证tableConfigs中的行
+      if (this.monitorForm.tableConfigs) {
+        for (let i = 0; i < this.monitorForm.tableConfigs.length; i++) {
+          const table = this.monitorForm.tableConfigs[i];
+          if (table.rows) {
+            for (let j = 0; j < table.rows.length; j++) {
+              const row = table.rows[j];
+              if (row.dataSource === 'api' && !row.valueKey) {
+                this.$message.warning(`表格${i + 1}行${j + 1}：API数据源的变量名不能为空`);
+                return;
+              }
+              // 验证子行
+              if (row.subRows) {
+                for (let k = 0; k < row.subRows.length; k++) {
+                  const subRow = row.subRows[k];
+                  if (subRow.dataSource === 'api' && !subRow.valueKey) {
+                    this.$message.warning(`表格${i + 1}行${j + 1}子行${k + 1}：API数据源的变量名不能为空`);
+                    return;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
       // 直接保存配置格式，不进行转换
       // 转换工作在前端展示页面加载时进行
       const configJson = {
         apiUrl: this.monitorForm.apiUrl,  // 保存API地址
+        procConditionGroup: this.monitorForm.procConditionGroup,  // 加工条件group
+        majorClassCd: this.monitorForm.majorClassCd,  // 大分类cd
+        minorClassCd: this.monitorForm.minorClassCd,  // 中分类cd
         formItems: this.monitorForm.formItems,
         widgetItems: this.monitorForm.widgetItems,
         descItems: this.monitorForm.descItems,
@@ -962,7 +1074,7 @@ export default {
         if (displayType === 'computed') {
           return '如：id * 100 或 (lat + lng) / 2（引用API字段进行计算）';
         } else {
-          return '如：name 或 address.city 或 geo.lat（支持嵌套路径）';
+          return '如：006;1;1（格式：加工条件種cd;多key区分;序号）';
         }
       } else if (dataSource === 'database') {
         // 数据库数据源

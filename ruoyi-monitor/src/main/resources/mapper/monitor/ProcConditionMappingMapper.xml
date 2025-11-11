@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.monitor.mapper.ProcConditionMappingMapper">
+
+    <resultMap type="com.ruoyi.monitor.domain.ProcConditionMapping" id="ProcConditionMappingResult">
+        <result property="id"                    column="id"                      />
+        <result property="procConditionGroup"    column="proc_condition_group"    />
+        <result property="majorClassCd"          column="major_class_cd"          />
+        <result property="minorClassCd"          column="minor_class_cd"          />
+        <result property="procConditionTypeCd"   column="proc_condition_type_cd"  />
+        <result property="multiKeyType"          column="multi_key_type"          />
+        <result property="procConditionSeq"      column="proc_condition_seq"      />
+        <result property="conditionName"         column="condition_name"          />
+        <result property="createTime"            column="create_time"             />
+        <result property="updateTime"            column="update_time"             />
+    </resultMap>
+
+    <sql id="selectProcConditionMappingVo">
+        select id, proc_condition_group, major_class_cd, minor_class_cd,
+               proc_condition_type_cd, multi_key_type, proc_condition_seq,
+               condition_name, create_time, update_time
+        from proc_condition_mapping
+    </sql>
+
+    <!-- 根据完整条件查询加工条件名称 -->
+    <select id="findConditionName" resultType="String">
+        SELECT condition_name
+        FROM proc_condition_mapping
+        WHERE proc_condition_group = #{group}
+          AND major_class_cd = #{majorCd}
+          AND minor_class_cd = #{minorCd}
+          AND proc_condition_type_cd = #{typeCd}
+          AND multi_key_type = #{multiKey}
+          AND proc_condition_seq = #{seq}
+        LIMIT 1
+    </select>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert">
+        INSERT INTO proc_condition_mapping
+        (proc_condition_group, major_class_cd, minor_class_cd,
+         proc_condition_type_cd, multi_key_type, proc_condition_seq, condition_name)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.procConditionGroup}, #{item.majorClassCd}, #{item.minorClassCd},
+             #{item.procConditionTypeCd}, #{item.multiKeyType}, #{item.procConditionSeq},
+             #{item.conditionName})
+        </foreach>
+    </insert>
+
+    <!-- 查询列表 -->
+    <select id="selectList" parameterType="com.ruoyi.monitor.domain.ProcConditionMapping" resultMap="ProcConditionMappingResult">
+        <include refid="selectProcConditionMappingVo"/>
+        <where>
+            <if test="procConditionGroup != null and procConditionGroup != ''">
+                and proc_condition_group = #{procConditionGroup}
+            </if>
+            <if test="majorClassCd != null and majorClassCd != ''">
+                and major_class_cd = #{majorClassCd}
+            </if>
+            <if test="minorClassCd != null and minorClassCd != ''">
+                and minor_class_cd = #{minorClassCd}
+            </if>
+            <if test="procConditionTypeCd != null and procConditionTypeCd != ''">
+                and proc_condition_type_cd = #{procConditionTypeCd}
+            </if>
+            <if test="multiKeyType != null and multiKeyType != ''">
+                and multi_key_type = #{multiKeyType}
+            </if>
+            <if test="procConditionSeq != null">
+                and proc_condition_seq = #{procConditionSeq}
+            </if>
+        </where>
+        ORDER BY proc_condition_group, major_class_cd, minor_class_cd,
+                 proc_condition_type_cd, multi_key_type, proc_condition_seq
+    </select>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" parameterType="Long" resultMap="ProcConditionMappingResult">
+        <include refid="selectProcConditionMappingVo"/>
+        WHERE id = #{id}
+    </select>
+
+    <!-- 新增 -->
+    <insert id="insert" parameterType="com.ruoyi.monitor.domain.ProcConditionMapping" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO proc_condition_mapping
+        (proc_condition_group, major_class_cd, minor_class_cd,
+         proc_condition_type_cd, multi_key_type, proc_condition_seq, condition_name)
+        VALUES
+        (#{procConditionGroup}, #{majorClassCd}, #{minorClassCd},
+         #{procConditionTypeCd}, #{multiKeyType}, #{procConditionSeq}, #{conditionName})
+    </insert>
+
+    <!-- 修改 -->
+    <update id="updateById" parameterType="com.ruoyi.monitor.domain.ProcConditionMapping">
+        UPDATE proc_condition_mapping
+        <set>
+            <if test="procConditionGroup != null and procConditionGroup != ''">proc_condition_group = #{procConditionGroup},</if>
+            <if test="majorClassCd != null and majorClassCd != ''">major_class_cd = #{majorClassCd},</if>
+            <if test="minorClassCd != null and minorClassCd != ''">minor_class_cd = #{minorClassCd},</if>
+            <if test="procConditionTypeCd != null and procConditionTypeCd != ''">proc_condition_type_cd = #{procConditionTypeCd},</if>
+            <if test="multiKeyType != null and multiKeyType != ''">multi_key_type = #{multiKeyType},</if>
+            <if test="procConditionSeq != null">proc_condition_seq = #{procConditionSeq},</if>
+            <if test="conditionName != null and conditionName != ''">condition_name = #{conditionName},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteById" parameterType="Long">
+        DELETE FROM proc_condition_mapping WHERE id = #{id}
+    </delete>
+
+    <!-- 批量删除 -->
+    <delete id="deleteBatchIds">
+        DELETE FROM proc_condition_mapping WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

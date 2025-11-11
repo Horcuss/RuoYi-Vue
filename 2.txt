@@ -1,0 +1,161 @@
+我想在monitorManage管理员页面中的基础信息部分加 加工条件group（01为非gp项目，02为gp项目），大分类cd，中分类cd这三个字段
+
+实现的功能：
+1.管理员在monitorManage页面配置好基础信息(加工条件group（01为非gp项目，02为gp项目），大分类cd，中分类cd这三个字段)
+2.管理员在monitorManage页面的api数据源中配置好一些信息（你帮我设计能正确匹配好数据的，我不会设计）
+3.gpMonitor等监控页面中，输入部分现在分为两个。一个是输入input，一个是下拉框。（下拉框可能没有，管理员在monitorManage的输入部分自定义input和下拉框。这部分怎么设计）
+4.用户输入好input，后，调用monitorManage页面中的管理员填写的api，获取值，解析xml，得到下拉框的值。
+5.用户选好下拉框的值后，显示值到监控页面的对应位置。
+6.因为响应体值显示值，不知道值具体的意思，所以客户提供给我们一张表，来辅助程序找到对应的值。
+表结构：
+加工条件group
+大分类cd
+中分类cd
+加工条件种cd
+多key区分(2是代表有多key，1是品名，3是其他工艺参数)
+加工条件序号
+加工条件名称
+
+表例子：
+02 001 n01 002 1 1  加工条件名称xxx
+02 001 n01 002 2 2  加工条件名称xxx
+02 001 n01 002 2 3  加工条件名称xxx
+02 001 n01 002 3 4  加工条件名称xxx
+02 001 n01 002 3 5  加工条件名称xxx
+02 001 n01 003 1 1  加工条件名称xxx
+02 001 n01 003 3 2  加工条件名称xxx
+02 001 n01 003 3 3  加工条件名称xxx
+02 001 n01 003 3 4  加工条件名称xxx
+02 001 n01 004 1 1  加工条件名称xxx
+02 001 n01 004 2 2  加工条件名称xxx
+02 001 n01 004 3 3  加工条件名称xxx
+02 001 n01 004 3 4  加工条件名称xxx
+02 001 n01 004 3 5  加工条件名称xxx
+
+请求体：gp工程<?xml version="1.0" encoding="UTF-8"?>
+<trafficParam>
+<trafficId>61112</trafficId>
+<pattern>
+<row>
+<item> 氏名cd</item>    不关注
+<item> 文书区分</item>  不关注
+<item> 制造规格类no</item>  不关注
+<item> 制作区分</item>   不关注
+<item> lotno</item>     不关注
+<item> 品名</item>       关注 （用户在input输入的）
+<item> 工程系列</item>   不关注
+<item> 品名种别cd</item>  不关注 
+<item> 大分类cd</item>   关注   （管理员输入的）
+<item> 中分类cd</item>   关注   （管理员输入的）
+<item> 加工条件种cd</item> 不关注  
+<item> 指示书</item>    不关注
+<item> 变更flag</item>  不关注
+</row>
+</pattern>
+</trafficParam>
+
+请求体：非gp工程
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficParam>
+<trafficId>61113</trafficId>
+<pattern>
+<row>
+<item> 氏名cd</item>  不关注
+<item> 制作区分</item>    不关注
+<item> lotno</item>   关注  （用户在input输入的）
+<item> 标准书</item>   不关注
+<item> 加工条件种cd</item>  不关注 
+<item> 大分类cd</item>    关注    （管理员输入的）
+<item> 中分类cd</item>   关注   （管理员输入的）
+</row>
+</pattern>
+</trafficParam>
+
+响应体:gp
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<trafficParam>
+<pattern>
+<row>
+<item> 02</item>品名种别cd   没用
+<item>品名</item>   没用
+<item> 工程系列</item>   没用
+<item> 大分类cd</item>  
+<item> 中分类cd</item>
+<item> 加工条件种cd1</item>
+<item> 加工条件种cd1的具体项目1的值</item>
+<item> 加工条件种cd1的具体项目2的值</item>
+<item> 加工条件种cd1的具体项目n的值</item>
+</row>
+<row>
+<item> 02</item>品名种别cd   没用
+<item>品名</item>   没用
+<item> 工程系列</item>   没用
+<item> 大分类cd</item>  
+<item> 中分类cd</item>
+<item> 加工条件种cd2</item>
+<item> 加工条件种cd2的具体项目1的值</item>
+<item> 加工条件种cd2的具体项目2的值</item>
+<item> 加工条件种cd2的具体项目n的值</item>
+</row>
+<row>
+<item> 02</item>品名种别cd   没用
+<item>品名</item>   没用
+<item> 工程系列</item>   没用
+<item> 大分类cd</item>  
+<item> 中分类cd</item>
+<item> 加工条件种cdn</item>                      加工条件种cdn(对应表结构第四列的值)
+<item> 加工条件种cdn的具体项目1的值</item>
+<item> 加工条件种cdn的具体项目2的值</item>
+<item> 加工条件种cdn的具体项目n的值</item>  
+</row>
+</pattern>
+<result> 1</result>  1：获取成功
+<resultMessage/> 
+<resultMessageId/> 
+</trafficParam>
+
+响应体:gp以外
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<trafficParam>
+<pattern>
+<row>
+<item> 01</item>品名种别cd   没用
+<item> 大分类cd</item>   
+<item> 中分类cd</item>
+<item> 加工条件种cd1</item>
+<item> 加工条件种cd1的具体项目1的值</item>
+<item>加工条件更新flag  9</item>
+<item> 加工条件种cd1的具体项目2的值</item>
+<item>加工条件更新flag  9</item>
+<item> 加工条件种cd1的具体项目n的值</item>
+<item>加工条件更新flag  9</item>
+</row>
+<row>
+<item> >品名种别cd</item   没用
+<item> 大分类cd</item>  
+<item> 中分类cd</item>
+<item> 加工条件种cd2</item>
+<item> 加工条件种cd2的具体项目1的值</item>
+<item>加工条件更新flag  9</item>
+<item> 加工条件种cd2的具体项目2的值</item>
+<item>加工条件更新flag  9</item>
+<item> 加工条件种cd2的具体项目n的值</item>
+<item>加工条件更新flag  9</item>
+</row>
+<row>
+<item> >品名种别cd</item   没用
+<item> 大分类cd</item>  
+<item> 中分类cd</item>
+<item> 加工条件种cdn/item>                        加工条件种cdn(对应表结构第四列的值)
+<item> 加工条件种cdn的具体项目1的值</item>
+<item>加工条件更新flag  9</item>
+<item> 加工条件种cdn的具体项目2的值</item>
+<item>加工条件更新flag  9</item>
+<item> 加工条件种cdn的具体项目n的值</item>
+<item>加工条件更新flag  9</item>
+</row>
+</pattern>
+<result> 1</result>  1获取成功
+<resultMessage/> 
+<resultMessageId/> 
+</trafficParam>

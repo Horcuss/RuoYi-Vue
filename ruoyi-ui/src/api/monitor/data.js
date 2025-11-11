@@ -9,3 +9,12 @@ export function getMonitorDataWithParams(configKey, params) {
   })
 }
 
+// 获取下拉框选项
+export function getSelectOptions(configKey, params) {
+  return request({
+    url: '/monitor/data/' + configKey + '/selectOptions',
+    method: 'post',
+    data: params
+  })
+}
+

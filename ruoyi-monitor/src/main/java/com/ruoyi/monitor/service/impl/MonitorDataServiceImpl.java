@@ -36,6 +36,12 @@ public class MonitorDataServiceImpl implements IMonitorDataService
     @Autowired
     private ISqlMergeService sqlMergeService;
 
+    @Autowired
+    private com.ruoyi.monitor.mapper.ProcConditionMappingMapper procConditionMappingMapper;
+
+    @Autowired
+    private com.ruoyi.monitor.cache.XmlDataCache xmlDataCache;
+
     /**
      * 根据配置KEY获取监控数据
      */
@@ -85,7 +91,7 @@ public class MonitorDataServiceImpl implements IMonitorDataService
 
             // 4. 获取API数据源的数据
             log.info("---------- 步骤4: 获取API数据 ----------");
-            Map<String, Object> apiData = getApiData(configJson, params);
+            Map<String, Object> apiData = getApiData(configKey, configJson, params);
             log.info("API数据获取完成，共 {} 条数据", apiData.size());
 
             // 5. 合并数据
@@ -176,15 +182,25 @@ public class MonitorDataServiceImpl implements IMonitorDataService
                 }
                 else if ("api".equals(dataSource))
                 {
-                    String expression = (String) item.get("expression");
-                    // 使用标准化后的表达式（如果存在）
-                    String normalizedExpression = (String) item.get("normalizedExpression");
-                    if (normalizedExpression == null)
+                    // 优先使用valueKey（用于XML数据源），否则使用标准化表达式（用于JSON数据源）
+                    String valueKey = (String) item.get("valueKey");
+                    if (StringUtils.isNotEmpty(valueKey))
                     {
-                        normalizedExpression = SymbolNormalizer.normalize(expression);
+                        value = rawData.get(valueKey);
+                        log.info("  {} -> {} (来源: api, 变量名: {})", label, value, valueKey);
                     }
-                    value = rawData.get(normalizedExpression);
-                    log.info("  {} -> {} (来源: api, 表达式: {})", label, value, normalizedExpression);
+                    else
+                    {
+                        String expression = (String) item.get("expression");
+                        // 使用标准化后的表达式（如果存在）
+                        String normalizedExpression = (String) item.get("normalizedExpression");
+                        if (normalizedExpression == null)
+                        {
+                            normalizedExpression = SymbolNormalizer.normalize(expression);
+                        }
+                        value = rawData.get(normalizedExpression);
+                        log.info("  {} -> {} (来源: api, 表达式: {})", label, value, normalizedExpression);
+                    }
                 }
 
                 descItem.put("value", value != null ? value : "");
@@ -239,14 +255,23 @@ public class MonitorDataServiceImpl implements IMonitorDataService
                 }
                 else if ("api".equals(dataSource))
                 {
-                    String expression = (String) item.get("expression");
-                    // 使用标准化后的表达式（如果存在）
-                    String normalizedExpression = (String) item.get("normalizedExpression");
-                    if (normalizedExpression == null)
+                    // 优先使用valueKey（用于XML数据源），否则使用标准化表达式（用于JSON数据源）
+                    String valueKey = (String) item.get("valueKey");
+                    if (StringUtils.isNotEmpty(valueKey))
                     {
-                        normalizedExpression = SymbolNormalizer.normalize(expression);
+                        value = rawData.get(valueKey);
                     }
-                    value = rawData.get(normalizedExpression);
+                    else
+                    {
+                        String expression = (String) item.get("expression");
+                        // 使用标准化后的表达式（如果存在）
+                        String normalizedExpression = (String) item.get("normalizedExpression");
+                        if (normalizedExpression == null)
+                        {
+                            normalizedExpression = SymbolNormalizer.normalize(expression);
+                        }
+                        value = rawData.get(normalizedExpression);
+                    }
                 }
 
                 remarkItem.put("content", value != null ? value : "");
@@ -332,16 +357,27 @@ public class MonitorDataServiceImpl implements IMonitorDataService
                             }
                             else if ("api".equals(dataSource))
                             {
-                                String expression = (String) row.get("expression");
-                                // 使用标准化后的表达式（如果存在）
-                                String normalizedExpression = (String) row.get("normalizedExpression");
-                                if (normalizedExpression == null)
+                                // 优先使用valueKey（用于XML数据源），否则使用标准化表达式（用于JSON数据源）
+                                String valueKey = (String) row.get("valueKey");
+                                if (StringUtils.isNotEmpty(valueKey))
                                 {
-                                    normalizedExpression = SymbolNormalizer.normalize(expression);
+                                    value = rawData.get(valueKey);
+                                    log.info("    行[{}] {} (简单行) -> {} (API, 变量名: {})",
+                                            rowIndex + 1, projectName, value, valueKey);
                                 }
-                                value = rawData.get(normalizedExpression);
-                                log.info("    行[{}] {} (简单行) -> {} (API, 表达式: {})",
-                                        rowIndex + 1, projectName, value, normalizedExpression);
+                                else
+                                {
+                                    String expression = (String) row.get("expression");
+                                    // 使用标准化后的表达式（如果存在）
+                                    String normalizedExpression = (String) row.get("normalizedExpression");
+                                    if (normalizedExpression == null)
+                                    {
+                                        normalizedExpression = SymbolNormalizer.normalize(expression);
+                                    }
+                                    value = rawData.get(normalizedExpression);
+                                    log.info("    行[{}] {} (简单行) -> {} (API, 表达式: {})",
+                                            rowIndex + 1, projectName, value, normalizedExpression);
+                                }
                             }
 
                             rowResult.put("value", value != null ? value : "");
@@ -403,16 +439,27 @@ public class MonitorDataServiceImpl implements IMonitorDataService
                                     }
                                     else if ("api".equals(dataSource))
                                     {
-                                        String expression = (String) subRow.get("expression");
-                                        // 使用标准化后的表达式（如果存在）
-                                        String normalizedExpression = (String) subRow.get("normalizedExpression");
-                                        if (normalizedExpression == null)
+                                        // 优先使用valueKey（用于XML数据源），否则使用标准化表达式（用于JSON数据源）
+                                        String valueKey = (String) subRow.get("valueKey");
+                                        if (StringUtils.isNotEmpty(valueKey))
                                         {
-                                            normalizedExpression = SymbolNormalizer.normalize(expression);
+                                            value = rawData.get(valueKey);
+                                            log.info("      子行[{}] {} -> {} (API, 变量名: {})",
+                                                    subRowIndex + 1, subName, value, valueKey);
                                         }
-                                        value = rawData.get(normalizedExpression);
-                                        log.info("      子行[{}] {} -> {} (API, 表达式: {})",
-                                                subRowIndex + 1, subName, value, normalizedExpression);
+                                        else
+                                        {
+                                            String expression = (String) subRow.get("expression");
+                                            // 使用标准化后的表达式（如果存在）
+                                            String normalizedExpression = (String) subRow.get("normalizedExpression");
+                                            if (normalizedExpression == null)
+                                            {
+                                                normalizedExpression = SymbolNormalizer.normalize(expression);
+                                            }
+                                            value = rawData.get(normalizedExpression);
+                                            log.info("      子行[{}] {} -> {} (API, 表达式: {})",
+                                                    subRowIndex + 1, subName, value, normalizedExpression);
+                                        }
                                     }
 
                                     subRowResult.put("value", value != null ? value : "");
@@ -445,8 +492,14 @@ public class MonitorDataServiceImpl implements IMonitorDataService
     /**
      * 从API获取数据
      * 调用外部API并根据配置的expression提取数据
+     * 支持JSON和XML两种响应格式
+     *
+     * @param configKey 配置KEY（用于缓存）
+     * @param configJson 配置JSON
+     * @param params 请求参数
+     * @return API数据
      */
-    private Map<String, Object> getApiData(JSONObject configJson, Map<String, Object> params)
+    private Map<String, Object> getApiData(String configKey, JSONObject configJson, Map<String, Object> params)
     {
         Map<String, Object> apiData = new HashMap<>();
 
@@ -472,9 +525,70 @@ public class MonitorDataServiceImpl implements IMonitorDataService
 
             log.info("准备调用外部API: {}", apiUrl);
 
-            // 2. 调用外部API
+            // 2. 检查是否为XML API（通过procConditionGroup判断）
+            boolean isXmlApi = StringUtils.isNotEmpty(configJson.getString("procConditionGroup"));
+
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
+            ResponseEntity<String> response;
+
+            if (isXmlApi)
+            {
+                // XML API - 使用POST请求
+                String group = configJson.getString("procConditionGroup");
+                String majorCd = configJson.getString("majorClassCd");
+                String minorCd = configJson.getString("minorClassCd");
+
+                params.put("majorClassCd", majorCd);
+                params.put("minorClassCd", minorCd);
+
+                // 先检查缓存
+                String cacheKey = xmlDataCache.generateCacheKey(configKey, params);
+                List<Map<String, String>> cachedXmlRows = xmlDataCache.get(cacheKey);
+
+                if (cachedXmlRows != null)
+                {
+                    // 缓存命中，直接使用缓存数据
+                    log.info("使用缓存的XML数据，跳过API调用");
+                    apiData = extractXmlData(configJson, cachedXmlRows, params);
+                    log.info("从缓存的XML数据中提取到 {} 个字段", apiData.size());
+                    return apiData;
+                }
+
+                // 缓存未命中，调用API
+                log.info("缓存未命中，调用XML API");
+
+                String xmlRequest;
+                if ("02".equals(group))
+                {
+                    xmlRequest = com.ruoyi.monitor.utils.XmlParser.buildGpXmlRequest(params);
+                }
+                else
+                {
+                    xmlRequest = com.ruoyi.monitor.utils.XmlParser.buildNonGpXmlRequest(params);
+                }
+
+                log.info("XML请求体: {}", xmlRequest);
+
+                org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+                headers.setContentType(org.springframework.http.MediaType.APPLICATION_XML);
+                org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(xmlRequest, headers);
+
+                response = restTemplate.postForEntity(apiUrl, entity, String.class);
+
+                // 解析并缓存结果
+                String xmlResponse = response.getBody();
+                if (xmlResponse != null && xmlResponse.trim().startsWith("<?xml"))
+                {
+                    List<Map<String, String>> xmlRows = com.ruoyi.monitor.utils.XmlParser.parseXmlResponse(xmlResponse);
+                    xmlDataCache.put(cacheKey, xmlRows);
+                    log.info("已缓存XML数据，cacheKey: {}", cacheKey);
+                }
+            }
+            else
+            {
+                // JSON API - 使用GET请求（保持原有逻辑）
+                response = restTemplate.getForEntity(apiUrl, String.class);
+            }
 
             if (!response.getStatusCode().is2xxSuccessful())
             {
@@ -485,11 +599,20 @@ public class MonitorDataServiceImpl implements IMonitorDataService
             String responseBody = response.getBody();
             log.info("API返回数据: {}", responseBody);
 
-            // 3. 解析API返回的JSON
-            JSONObject apiResponse = JSON.parseObject(responseBody);
-
-            // 4. 根据配置中的expression提取数据
-            apiData = extractApiData(configJson, apiResponse);
+            // 3. 根据响应类型解析数据
+            if (responseBody.trim().startsWith("<?xml"))
+            {
+                // XML响应
+                log.info("检测到XML响应，使用XML解析逻辑");
+                apiData = extractXmlData(configJson, responseBody, params);
+            }
+            else
+            {
+                // JSON响应
+                log.info("检测到JSON响应，使用JSON解析逻辑");
+                JSONObject apiResponse = JSON.parseObject(responseBody);
+                apiData = extractApiData(configJson, apiResponse);
+            }
 
             log.info("从API提取到 {} 个字段的数据", apiData.size());
         }
@@ -1373,6 +1496,462 @@ public class MonitorDataServiceImpl implements IMonitorDataService
         }
         // 其次使用expression
         return (String) item.get("expression");
+    }
+
+    /**
+     * 从XML响应中提取数据
+     *
+     * @param configJson 配置JSON
+     * @param xmlResponse XML响应字符串
+     * @param params 请求参数（包含下拉框选择值）
+     * @return 提取的数据Map
+     */
+    /**
+     * 从XML响应中提取数据
+     */
+    private Map<String, Object> extractXmlData(JSONObject configJson, String xmlResponse, Map<String, Object> params) throws Exception
+    {
+        log.info("开始从XML响应中提取数据");
+
+        // 1. 解析XML
+        List<Map<String, String>> xmlRows = com.ruoyi.monitor.utils.XmlParser.parseXmlResponse(xmlResponse);
+        log.info("解析XML，共 {} 个row", xmlRows.size());
+
+        // 2. 调用重载方法处理
+        return extractXmlData(configJson, xmlRows, params);
+    }
+
+    /**
+     * 从XML行数据中提取数据（重载方法，用于缓存优化）
+     */
+    private Map<String, Object> extractXmlData(JSONObject configJson, List<Map<String, String>> xmlRows, Map<String, Object> params) throws Exception
+    {
+        Map<String, Object> result = new HashMap<>();
+
+        log.info("从XML行数据中提取配置项，共 {} 个row", xmlRows.size());
+
+        // 1. 获取基础配置
+        String group = configJson.getString("procConditionGroup");
+        String majorCd = configJson.getString("majorClassCd");
+        String minorCd = configJson.getString("minorClassCd");
+
+        log.info("基础配置: group={}, majorCd={}, minorCd={}", group, majorCd, minorCd);
+
+        // 2. 根据下拉框选择值确定对应的row
+        Map<String, String> selectedRow = findSelectedRow(xmlRows, params, configJson);
+
+        if (selectedRow == null)
+        {
+            log.warn("未找到匹配的XML row");
+            return result;
+        }
+
+        log.info("找到匹配的row: {}", selectedRow);
+
+        // 4. 从选中的row中提取所有配置项的值
+        if (configJson.containsKey("descItems"))
+        {
+            extractXmlItems((List<Map<String, Object>>) configJson.get("descItems"),
+                    selectedRow, group, majorCd, minorCd, result);
+        }
+
+        if (configJson.containsKey("remarkItems"))
+        {
+            extractXmlItems((List<Map<String, Object>>) configJson.get("remarkItems"),
+                    selectedRow, group, majorCd, minorCd, result);
+        }
+
+        if (configJson.containsKey("tableConfigs"))
+        {
+            extractXmlTableItems(configJson, selectedRow, group, majorCd, minorCd, result);
+        }
+
+        log.info("从XML提取数据完成，共 {} 个字段", result.size());
+
+        return result;
+    }
+
+    /**
+     * 根据下拉框选择值找到对应的XML row
+     *
+     * @param xmlRows 所有XML行
+     * @param params 请求参数（包含用户输入和下拉框选择值）
+     * @param configJson 配置JSON
+     * @return 匹配的row
+     */
+    private Map<String, String> findSelectedRow(
+            List<Map<String, String>> xmlRows,
+            Map<String, Object> params,
+            JSONObject configJson)
+    {
+        try
+        {
+            // 1. 获取下拉框配置信息
+            @SuppressWarnings("unchecked")
+            Map<String, Object> selectConfigs = (Map<String, Object>) params.get("selectConfigs");
+
+            if (selectConfigs == null || selectConfigs.isEmpty())
+            {
+                log.warn("未找到下拉框配置信息，返回第一个row");
+                return xmlRows.isEmpty() ? null : xmlRows.get(0);
+            }
+
+            // 2. 遍历下拉框配置，找到匹配的row
+            for (Map.Entry<String, Object> entry : selectConfigs.entrySet())
+            {
+                String selectProp = entry.getKey();  // "deviceType"
+                Object selectValue = params.get(selectProp);  // "222"
+
+                if (selectValue == null)
+                {
+                    continue;
+                }
+
+                @SuppressWarnings("unchecked")
+                Map<String, Object> selectConfig = (Map<String, Object>) entry.getValue();
+                String expression = (String) selectConfig.get("expression");  // "001;2;2"
+
+                // 3. 解析下拉框的expression
+                String[] parts = expression.split(";");
+                String targetTypeCode = parts[0];  // "001"
+                int selectSeq = Integer.parseInt(parts[2]);  // 2
+
+                // 4. 找到匹配的row
+                for (Map<String, String> row : xmlRows)
+                {
+                    // 假设加工条件種cd在第6个位置（item_5）
+                    String rowTypeCode = row.get("item_5");
+
+                    if (targetTypeCode.equals(rowTypeCode))
+                    {
+                        // 检查该row的序号值是否匹配用户选择
+                        String rowValue = row.get("item_" + (5 + selectSeq));  // item_7 (5+2)
+
+                        if (selectValue.toString().equals(rowValue))
+                        {
+                            log.info("找到匹配的row: 加工条件種cd={}, 序号{}={}",
+                                    targetTypeCode, selectSeq, rowValue);
+                            return row;
+                        }
+                    }
+                }
+            }
+
+            log.warn("未找到匹配的row，返回第一个row");
+            return xmlRows.isEmpty() ? null : xmlRows.get(0);
+
+        }
+        catch (Exception e)
+        {
+            log.error("匹配XML row失败", e);
+            return xmlRows.isEmpty() ? null : xmlRows.get(0);
+        }
+    }
+
+    /**
+     * 从XML row中提取配置项的值
+     *
+     * @param items 配置项列表
+     * @param xmlRow XML行数据
+     * @param group 加工条件group
+     * @param majorCd 大分类cd
+     * @param minorCd 中分类cd
+     * @param result 结果Map
+     */
+    private void extractXmlItems(
+            List<Map<String, Object>> items,
+            Map<String, String> xmlRow,
+            String group, String majorCd, String minorCd,
+            Map<String, Object> result)
+    {
+        for (Map<String, Object> item : items)
+        {
+            if (!"api".equals(item.get("dataSource")))
+            {
+                continue;
+            }
+
+            String expression = (String) item.get("expression");
+            String valueKey = (String) item.get("valueKey");
+
+            // 解析expression: "006;1;1"
+            String[] parts = expression.split(";");
+            if (parts.length != 3)
+            {
+                log.warn("表达式格式错误: {}", expression);
+                continue;
+            }
+
+            String typeCd = parts[0];
+            String multiKey = parts[1];
+            Integer seq = Integer.parseInt(parts[2]);
+
+            // 1. 查询映射表获取加工条件名称
+            String conditionName = procConditionMappingMapper.findConditionName(
+                    group, majorCd, minorCd, typeCd, multiKey, seq
+            );
+
+            // 2. 从XML row中提取值
+            // 假设固定字段有6个，序号值从第7个item开始
+            String value = xmlRow.get("item_" + (5 + seq));
+
+            log.info("提取字段: {} -> {} (加工条件名称: {})", valueKey, value, conditionName);
+
+            // 3. 存储（使用valueKey）
+            if (StringUtils.isNotEmpty(valueKey))
+            {
+                result.put(valueKey, value);
+            }
+
+            // 同时存储加工条件名称（用于前端显示label）
+            if (StringUtils.isNotEmpty(conditionName))
+            {
+                result.put(valueKey + "_name", conditionName);
+            }
+        }
+    }
+
+    /**
+     * 从XML row中提取表格项的值
+     */
+    private void extractXmlTableItems(
+            JSONObject configJson,
+            Map<String, String> xmlRow,
+            String group, String majorCd, String minorCd,
+            Map<String, Object> result)
+    {
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> tableConfigs = (List<Map<String, Object>>) configJson.get("tableConfigs");
+
+        for (Map<String, Object> tableConfig : tableConfigs)
+        {
+            if (!tableConfig.containsKey("rows"))
+            {
+                continue;
+            }
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> rows = (List<Map<String, Object>>) tableConfig.get("rows");
+
+            for (Map<String, Object> row : rows)
+            {
+                String rowType = (String) row.get("rowType");
+
+                if ("simple".equals(rowType))
+                {
+                    // 简单行
+                    if ("api".equals(row.get("dataSource")))
+                    {
+                        extractSingleXmlItem(row, xmlRow, group, majorCd, minorCd, result);
+                    }
+                }
+                else if ("complex".equals(rowType))
+                {
+                    // 复杂行：处理 subRows
+                    if (row.containsKey("subRows"))
+                    {
+                        @SuppressWarnings("unchecked")
+                        List<Map<String, Object>> subRows = (List<Map<String, Object>>) row.get("subRows");
+
+                        for (Map<String, Object> subRow : subRows)
+                        {
+                            if ("api".equals(subRow.get("dataSource")))
+                            {
+                                extractSingleXmlItem(subRow, xmlRow, group, majorCd, minorCd, result);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 提取单个XML项
+     */
+    private void extractSingleXmlItem(
+            Map<String, Object> item,
+            Map<String, String> xmlRow,
+            String group, String majorCd, String minorCd,
+            Map<String, Object> result)
+    {
+        String expression = (String) item.get("expression");
+        String valueKey = (String) item.get("valueKey");
+
+        String[] parts = expression.split(";");
+        if (parts.length != 3)
+        {
+            log.warn("表达式格式错误: {}", expression);
+            return;
+        }
+
+        String typeCd = parts[0];
+        String multiKey = parts[1];
+        Integer seq = Integer.parseInt(parts[2]);
+
+        // 查询映射表
+        String conditionName = procConditionMappingMapper.findConditionName(
+                group, majorCd, minorCd, typeCd, multiKey, seq
+        );
+
+        // 从XML row中提取值
+        String value = xmlRow.get("item_" + (5 + seq));
+
+        log.info("提取表格字段: {} -> {} (加工条件名称: {})", valueKey, value, conditionName);
+
+        if (StringUtils.isNotEmpty(valueKey))
+        {
+            result.put(valueKey, value);
+        }
+
+        if (StringUtils.isNotEmpty(conditionName))
+        {
+            result.put(valueKey + "_name", conditionName);
+        }
+    }
+
+    /**
+     * 获取下拉框选项
+     */
+    @Override
+    public Map<String, Object> getSelectOptions(String configKey, Map<String, Object> params)
+    {
+        Map<String, Object> result = new HashMap<>();
+
+        log.info("==================== 开始获取下拉框选项 ====================");
+        log.info("配置KEY: {}", configKey);
+        log.info("请求参数: {}", params);
+
+        try
+        {
+            // 1. 查询配置
+            MonitorConfig config = monitorConfigService.selectMonitorConfigByConfigKey(configKey);
+            if (config == null)
+            {
+                log.error("监控配置不存在: {}", configKey);
+                return result;
+            }
+
+            // 2. 解析配置JSON
+            JSONObject configJson = JSON.parseObject(config.getConfigJson());
+
+            // 3. 获取基础配置
+            String group = configJson.getString("procConditionGroup");
+            String majorCd = configJson.getString("majorClassCd");
+            String minorCd = configJson.getString("minorClassCd");
+
+            log.info("基础配置: group={}, majorCd={}, minorCd={}", group, majorCd, minorCd);
+
+            // 4. 构建XML请求体
+            params.put("majorClassCd", majorCd);
+            params.put("minorClassCd", minorCd);
+
+            String xmlRequest;
+            if ("02".equals(group))
+            {
+                // GP项目
+                xmlRequest = com.ruoyi.monitor.utils.XmlParser.buildGpXmlRequest(params);
+            }
+            else
+            {
+                // 非GP项目
+                xmlRequest = com.ruoyi.monitor.utils.XmlParser.buildNonGpXmlRequest(params);
+            }
+
+            log.info("XML请求体: {}", xmlRequest);
+
+            // 5. 调用API
+            String apiUrl = configJson.getString("apiUrl");
+            if (StringUtils.isEmpty(apiUrl))
+            {
+                log.warn("未配置API地址");
+                return result;
+            }
+
+            RestTemplate restTemplate = new RestTemplate();
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_XML);
+            org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(xmlRequest, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, entity, String.class);
+
+            if (!response.getStatusCode().is2xxSuccessful())
+            {
+                log.error("API调用失败，状态码: {}", response.getStatusCode());
+                return result;
+            }
+
+            String xmlResponse = response.getBody();
+            log.info("XML响应: {}", xmlResponse);
+
+            // 6. 解析XML响应
+            List<Map<String, String>> xmlRows = com.ruoyi.monitor.utils.XmlParser.parseXmlResponse(xmlResponse);
+            log.info("解析XML，共 {} 个row", xmlRows.size());
+
+            // 7. 缓存XML数据（用于后续查询时直接使用，避免重复调用API）
+            String cacheKey = xmlDataCache.generateCacheKey(configKey, params);
+            xmlDataCache.put(cacheKey, xmlRows);
+            log.info("已缓存XML数据，cacheKey: {}", cacheKey);
+
+            // 8. 处理下拉框配置
+            if (configJson.containsKey("formItems"))
+            {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> formItems = (List<Map<String, Object>>) configJson.get("formItems");
+
+                for (Map<String, Object> item : formItems)
+                {
+                    if ("select".equals(item.get("type")) && "xml".equals(item.get("dataSource")))
+                    {
+                        String prop = (String) item.get("prop");
+                        String expression = (String) item.get("expression");
+
+                        log.info("处理下拉框: prop={}, expression={}", prop, expression);
+
+                        // 解析expression: "001;2;2"
+                        String[] parts = expression.split(";");
+                        if (parts.length != 3)
+                        {
+                            log.warn("下拉框表达式格式错误: {}", expression);
+                            continue;
+                        }
+
+                        String targetTypeCode = parts[0];  // 加工条件種cd
+                        int itemSeq = Integer.parseInt(parts[2]); // 序号
+
+                        // 提取选项值
+                        java.util.Set<String> options = new java.util.LinkedHashSet<>();
+                        for (Map<String, String> row : xmlRows)
+                        {
+                            // 假设加工条件種cd在第6个位置（item_5）
+                            String rowTypeCode = row.get("item_5");
+                            if (targetTypeCode.equals(rowTypeCode))
+                            {
+                                // 计算序号值的位置：固定字段数(6) + 序号位置
+                                String optionValue = row.get("item_" + (5 + itemSeq));
+                                if (StringUtils.isNotEmpty(optionValue))
+                                {
+                                    options.add(optionValue);
+                                }
+                            }
+                        }
+
+                        log.info("下拉框 {} 的选项: {}", prop, options);
+                        result.put(prop, new ArrayList<>(options));
+                    }
+                }
+            }
+
+            log.info("==================== 下拉框选项获取完成 ====================");
+        }
+        catch (Exception e)
+        {
+            log.error("==================== 获取下拉框选项失败 ====================", e);
+            log.error("配置KEY: {}", configKey);
+            log.error("请求参数: {}", params);
+        }
+
+        return result;
     }
 }
 

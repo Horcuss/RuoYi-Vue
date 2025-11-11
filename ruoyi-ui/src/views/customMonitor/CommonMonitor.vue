@@ -107,7 +107,7 @@
 <script>
 import CmGrid from '@/components/CompassMonitor/CmGrid/index.js'
 import { getConfigByKey } from "@/api/monitor/config";
-import { getMonitorDataWithParams } from "@/api/monitor/data";
+import { getMonitorDataWithParams, getSelectOptions } from "@/api/monitor/data";
 
 export default {
   name: 'CommonMonitor',
@@ -201,6 +201,7 @@ export default {
             inline: true,
             items: this.config.formItems,
             onChange: this.handleFormChange,
+            onEnter: this.handleEnter,
             onSubmit: this.handleQuery
           });
         }
@@ -260,9 +261,26 @@ export default {
       }
     },
 
-    /** 处理表单变化 - 自动查询 */
+    /** 处理表单变化 - 仅更新formData */
     handleFormChange(formData) {
+      console.log('=== handleFormChange 触发 ===', formData);
       this.formData = formData;
+    },
+
+    /** 处理回车键 - 获取下拉框选项或自动查询 */
+    handleEnter(formData) {
+      console.log('=== handleEnter 触发（用户按下回车） ===', formData);
+      this.formData = formData;
+
+      // 检查是否需要获取下拉框选项
+      const needFetchOptions = this.checkNeedFetchSelectOptions(formData);
+      console.log('是否需要获取下拉框选项:', needFetchOptions);
+
+      if (needFetchOptions) {
+        console.log('开始获取下拉框选项...');
+        this.fetchSelectOptions(formData);
+        return;
+      }
 
       // 检查是否所有必填字段都已填写
       if (this.config && this.config.formItems) {
@@ -271,6 +289,8 @@ export default {
           return value !== null && value !== undefined && value !== '';
         });
 
+        console.log('所有字段是否填写完成:', allFilled);
+
         // 如果所有字段都填写完成，自动查询
         if (allFilled) {
           this.handleQuery(formData);
@@ -278,12 +298,94 @@ export default {
       }
     },
 
+    /**
+     * 检查是否需要获取下拉框选项
+     * 条件：所有input已填写 && 有select未加载选项 && select的dataSource是xml
+     */
+    checkNeedFetchSelectOptions(formData) {
+      if (!this.config || !this.config.formItems) {
+        console.log('配置不存在');
+        return false;
+      }
+
+      // 查找input类型的字段
+      const inputItems = this.config.formItems.filter(item => item.type === 'input');
+      console.log('input类型的字段:', inputItems);
+
+      // 检查所有input是否都已填写
+      const allInputFilled = inputItems.every(item => {
+        const value = formData[item.prop];
+        const filled = value !== null && value !== undefined && value !== '';
+        console.log(`  ${item.prop}: "${value}" -> ${filled ? '已填写' : '未填写'}`);
+        return filled;
+      });
+      console.log('所有input是否都已填写:', allInputFilled);
+
+      // 检查是否有select类型且未加载选项（并且dataSource是xml）
+      const hasEmptySelect = this.config.formItems.some(item => {
+        if (item.type === 'select' && item.dataSource === 'xml') {
+          const empty = !item.options || item.options.length === 0;
+          console.log(`  ${item.prop} (select): options长度=${item.options ? item.options.length : 0}, empty=${empty}`);
+          return empty;
+        }
+        return false;
+      });
+      console.log('是否有需要从XML加载的空select:', hasEmptySelect);
+
+      return allInputFilled && hasEmptySelect;
+    },
+
+    /**
+     * 获取下拉框选项
+     */
+    fetchSelectOptions(formData) {
+      this.loading = true;
+      console.log('发送请求获取下拉框选项:', this.configKey, formData);
+
+      // 调用后端接口
+      getSelectOptions(this.configKey, formData)
+        .then(response => {
+          console.log('下拉框选项响应:', response);
+          if (response.code === 200) {
+            const options = response.data;
+            console.log('解析到的选项:', options);
+
+            // 更新formItems中的options
+            this.config.formItems.forEach(item => {
+              if (item.type === 'select' && options[item.prop]) {
+                console.log(`为 ${item.prop} 设置选项:`, options[item.prop]);
+                this.$set(item, 'options', options[item.prop].map(val => ({
+                  label: val,
+                  value: val
+                })));
+              }
+            });
+
+            // 重新构建UI
+            this.buildMonitorUI();
+          }
+          this.loading = false;
+        })
+        .catch(error => {
+          console.error('获取下拉框选项失败:', error);
+          this.loading = false;
+          this.$message.error('获取下拉框选项失败');
+        });
+    },
+
     /** 处理查询 */
     handleQuery(formData) {
       this.formData = formData;
       this.loading = true;
 
-      getMonitorDataWithParams(this.configKey, formData).then(response => {
+      // 构建请求参数，包含下拉框的配置信息
+      const requestData = {
+        ...formData,
+        // 新增：下拉框配置映射
+        selectConfigs: this.getSelectConfigs()
+      };
+
+      getMonitorDataWithParams(this.configKey, requestData).then(response => {
         if (response.data) {
           this.updateMonitorData(response.data);
         }
@@ -292,6 +394,25 @@ export default {
         this.loading = false;
         this.$message.error(`查询${this.monitorName}数据失败`);
       });
+    },
+
+    /**
+     * 获取下拉框配置信息
+     */
+    getSelectConfigs() {
+      const configs = {};
+
+      if (this.config && this.config.formItems) {
+        this.config.formItems.forEach(item => {
+          if (item.type === 'select' && item.dataSource === 'xml') {
+            configs[item.prop] = {
+              expression: item.expression  // "001;2;2"
+            };
+          }
+        });
+      }
+
+      return configs;
     },
 
     /** 将配置格式转换为渲染格式 */

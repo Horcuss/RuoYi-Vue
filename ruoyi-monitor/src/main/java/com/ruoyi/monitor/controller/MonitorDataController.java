@@ -31,5 +31,18 @@ public class MonitorDataController extends BaseController
         Map<String, Object> data = monitorDataService.getMonitorData(configKey, params);
         return success(data);
     }
+
+    /**
+     * 获取下拉框选项
+     * @param configKey 配置KEY
+     * @param params 包含用户输入的品名/lotno等参数
+     */
+    @PostMapping("/{configKey}/selectOptions")
+    public AjaxResult getSelectOptions(@PathVariable("configKey") String configKey,
+                                       @RequestBody Map<String, Object> params)
+    {
+        Map<String, Object> options = monitorDataService.getSelectOptions(configKey, params);
+        return success(options);
+    }
 }
 
