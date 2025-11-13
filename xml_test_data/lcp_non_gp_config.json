@@ -1,0 +1,181 @@
+{
+  "apiUrl": "http://localhost:8080/api/xmltest/test_lcp_non_gp",
+  "procConditionGroup": "01",
+  "majorClassCd": "001",
+  "minorClassCd": "N01",
+  "formItems": [
+    {
+      "label": "LCP品名",
+      "prop": "lcpName",
+      "type": "input"
+    },
+    {
+      "label": "工程系列",
+      "prop": "engineeringSeries",
+      "type": "select",
+      "dataSource": "xml",
+      "expression": "001;2;2"
+    },
+    {
+      "label": "型号",
+      "prop": "model",
+      "type": "select",
+      "dataSource": "xml",
+      "expression": "001;2;3"
+    },
+    {
+      "label": "版本",
+      "prop": "version",
+      "type": "select",
+      "dataSource": "xml",
+      "expression": "001;2;4"
+    }
+  ],
+  "widgetItems": [
+    {
+      "text": "LCP加工标准",
+      "href": "http://example.com/lcp-standard",
+      "icon": "el-icon-link",
+      "target": "_blank",
+      "type": "primary"
+    }
+  ],
+  "descItems": [
+    {
+      "label": "LCP品名",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;1",
+      "valueKey": "lcpName"
+    },
+    {
+      "label": "工程系列",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;2",
+      "valueKey": "engineeringSeries"
+    },
+    {
+      "label": "型号",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;3",
+      "valueKey": "model"
+    },
+    {
+      "label": "版本",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;4",
+      "valueKey": "version"
+    },
+    {
+      "label": "温度",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;5",
+      "valueKey": "temperature"
+    },
+    {
+      "label": "速度",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;6",
+      "valueKey": "speed"
+    },
+    {
+      "label": "平均温速(Computed)",
+      "dataSource": "api",
+      "displayType": "computed",
+      "expression": "(temperature + speed) / 2",
+      "valueKey": "avgTempSpeed"
+    }
+  ],
+  "remarkItems": [
+    {
+      "title": "工艺说明",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "003;3;1",
+      "valueKey": "processNote"
+    }
+  ],
+  "tableConfigs": [
+    {
+      "rowHeader": "印刷检查",
+      "rows": [
+        {
+          "rowType": "simple",
+          "projectName": "LCP处置项次",
+          "unit": "",
+          "dataSource": "api",
+          "displayType": "direct",
+          "expression": "002;3;1",
+          "valueKey": "disposalTimes"
+        },
+        {
+          "rowType": "simple",
+          "projectName": "印刷方式",
+          "unit": "",
+          "dataSource": "api",
+          "displayType": "direct",
+          "expression": "002;3;2",
+          "valueKey": "printMethod"
+        },
+        {
+          "rowType": "simple",
+          "projectName": "速度",
+          "unit": "m/min",
+          "dataSource": "api",
+          "displayType": "direct",
+          "expression": "002;3;4",
+          "valueKey": "speed002"
+        },
+        {
+          "rowType": "simple",
+          "projectName": "LCP量",
+          "unit": "um",
+          "dataSource": "api",
+          "displayType": "direct",
+          "expression": "002;3;5",
+          "valueKey": "lcpAmount"
+        }
+      ]
+    },
+    {
+      "rowHeader": "尺寸检查",
+      "rows": [
+        {
+          "rowType": "complex",
+          "projectName": "基准精度/尺度",
+          "subRows": [
+            {
+              "subName": "L",
+              "unit": "um",
+              "dataSource": "api",
+              "displayType": "direct",
+              "expression": "004;3;1",
+              "valueKey": "precisionL"
+            },
+            {
+              "subName": "W",
+              "unit": "um",
+              "dataSource": "api",
+              "displayType": "direct",
+              "expression": "004;3;2",
+              "valueKey": "precisionW"
+            },
+            {
+              "subName": "H",
+              "unit": "um",
+              "dataSource": "api",
+              "displayType": "direct",
+              "expression": "004;3;3",
+              "valueKey": "precisionH"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -265,6 +265,21 @@ export default {
     handleFormChange(formData) {
       console.log('=== handleFormChange 触发 ===', formData);
       this.formData = formData;
+
+      // 检查所有input框是否都为空
+      if (this.config && this.config.formItems) {
+        const inputItems = this.config.formItems.filter(item => item.type === 'input');
+        const allInputEmpty = inputItems.every(item => {
+          const value = formData[item.prop];
+          return value === null || value === undefined || value === '';
+        });
+
+        // 如果所有input都为空，重置下拉框和数据
+        if (allInputEmpty && inputItems.length > 0) {
+          console.log('所有input框都为空，重置下拉框和数据');
+          this.resetSelectsAndData();
+        }
+      }
     },
 
     /** 处理回车键 - 获取下拉框选项或自动查询 */
@@ -487,6 +502,62 @@ export default {
           }
         });
       }
+    },
+
+    /** 重置下拉框和数据 */
+    resetSelectsAndData() {
+      console.log('开始重置下拉框和数据...');
+
+      // 1. 清空下拉框的options和值
+      if (this.config && this.config.formItems) {
+        this.config.formItems.forEach(item => {
+          if (item.type === 'select' && item.dataSource === 'xml') {
+            // 清空options
+            this.$set(item, 'options', []);
+            // 清空formData中的值
+            if (this.formData && this.formData[item.prop]) {
+              this.$set(this.formData, item.prop, '');
+            }
+          }
+        });
+      }
+
+      // 2. 清空基础信息数据
+      if (this.infoData[0] && this.infoData[0][0]) {
+        this.infoData[0][0].items = this.config.descItems.map(item => ({
+          label: item.label,
+          value: ''
+        }));
+      }
+
+      // 3. 清空备注数据
+      if (this.config.remarkItems && this.config.remarkItems.length > 0) {
+        this.remarks = this.config.remarkItems.map(item => ({
+          title: item.title,
+          content: ''
+        }));
+      }
+
+      // 4. 清空表格数据
+      if (this.config.tableConfigs && this.tables.length > 0) {
+        this.config.tableConfigs.forEach((tableConfig, index) => {
+          if (this.tables[index] && tableConfig.rows) {
+            const renderRows = this.convertConfigToRenderRows(tableConfig.rows);
+            this.tables[index].body.rows = renderRows.map(row => ({
+              projectName: row.projectName,
+              projectNameRowSpan: row.projectNameRowSpan,
+              subName: row.subName,
+              unit: row.unit,
+              value: ''
+            }));
+          }
+        });
+      }
+
+      // 5. 重新构建UI（触发表单重新渲染）
+      this.buildMonitorUI();
+
+      console.log('重置完成');
     }
   }
 };

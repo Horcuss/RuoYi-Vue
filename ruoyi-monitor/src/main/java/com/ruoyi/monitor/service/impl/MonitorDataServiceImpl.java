@@ -1534,36 +1534,44 @@ public class MonitorDataServiceImpl implements IMonitorDataService
         String group = configJson.getString("procConditionGroup");
         String majorCd = configJson.getString("majorClassCd");
         String minorCd = configJson.getString("minorClassCd");
+        boolean isGpProject = "02".equals(group);
 
-        log.info("基础配置: group={}, majorCd={}, minorCd={}", group, majorCd, minorCd);
+        log.info("基础配置: group={}, majorCd={}, minorCd={}, isGpProject={}", group, majorCd, minorCd, isGpProject);
 
-        // 2. 根据下拉框选择值确定对应的row
-        Map<String, String> selectedRow = findSelectedRow(xmlRows, params, configJson);
-
-        if (selectedRow == null)
+        // 0. 清理XML rows（非GP项目需要移除分隔符）
+        List<Map<String, String>> cleanedXmlRows = new ArrayList<>();
+        for (Map<String, String> row : xmlRows)
         {
-            log.warn("未找到匹配的XML row");
+            cleanedXmlRows.add(cleanXmlRowIfNeeded(row, isGpProject));
+        }
+
+        // 2. 根据下拉框选择值确定对应的rows（按cd分组）
+        Map<String, Map<String, String>> selectedRows = findSelectedRows(cleanedXmlRows, params, configJson, group);
+
+        if (selectedRows.isEmpty())
+        {
+            log.warn("未找到匹配的XML rows");
             return result;
         }
 
-        log.info("找到匹配的row: {}", selectedRow);
+        log.info("找到匹配的rows，共 {} 个cd", selectedRows.size());
 
-        // 4. 从选中的row中提取所有配置项的值
+        // 4. 从选中的rows中提取所有配置项的值
         if (configJson.containsKey("descItems"))
         {
             extractXmlItems((List<Map<String, Object>>) configJson.get("descItems"),
-                    selectedRow, group, majorCd, minorCd, result);
+                    selectedRows, group, majorCd, minorCd, result);
         }
 
         if (configJson.containsKey("remarkItems"))
         {
             extractXmlItems((List<Map<String, Object>>) configJson.get("remarkItems"),
-                    selectedRow, group, majorCd, minorCd, result);
+                    selectedRows, group, majorCd, minorCd, result);
         }
 
         if (configJson.containsKey("tableConfigs"))
         {
-            extractXmlTableItems(configJson, selectedRow, group, majorCd, minorCd, result);
+            extractXmlTableItems(configJson, selectedRows, group, majorCd, minorCd, result);
         }
 
         log.info("从XML提取数据完成，共 {} 个字段", result.size());
@@ -1572,35 +1580,60 @@ public class MonitorDataServiceImpl implements IMonitorDataService
     }
 
     /**
-     * 根据下拉框选择值找到对应的XML row
+     * 根据下拉框选择值找到对应的XML rows（按加工条件種cd分组）
      *
      * @param xmlRows 所有XML行
      * @param params 请求参数（包含用户输入和下拉框选择值）
      * @param configJson 配置JSON
-     * @return 匹配的row
+     * @param group 加工条件group
+     * @return 匹配的rows，key为加工条件種cd，value为匹配的row
      */
-    private Map<String, String> findSelectedRow(
+    private Map<String, Map<String, String>> findSelectedRows(
             List<Map<String, String>> xmlRows,
             Map<String, Object> params,
-            JSONObject configJson)
+            JSONObject configJson,
+            String group)
     {
+        Map<String, Map<String, String>> result = new HashMap<>();
+        int cdIndex = getCdIndex(group);
+        int dataStartIndex = getDataStartIndex(group);
+
+        log.info("findSelectedRows: group={}, cdIndex={}, dataStartIndex={}", group, cdIndex, dataStartIndex);
+
         try
         {
-            // 1. 获取下拉框配置信息
+            // 1. 收集所有需要的cd（包括下拉框的cd和descItems/remarkItems/tableConfigs中的cd）
+            java.util.Set<String> allRequiredCds = new java.util.HashSet<>();
+            collectAllRequiredCds(configJson, allRequiredCds);
+
+            log.info("配置中需要的所有cd: {}", allRequiredCds);
+
+            // 2. 获取下拉框配置信息
             @SuppressWarnings("unchecked")
             Map<String, Object> selectConfigs = (Map<String, Object>) params.get("selectConfigs");
 
             if (selectConfigs == null || selectConfigs.isEmpty())
             {
-                log.warn("未找到下拉框配置信息，返回第一个row");
-                return xmlRows.isEmpty() ? null : xmlRows.get(0);
+                log.warn("未找到下拉框配置信息");
+                // 没有下拉框，为每个需要的cd找第一个匹配的row
+                for (String cd : allRequiredCds)
+                {
+                    Map<String, String> firstRow = findFirstRowByTypeCode(xmlRows, cd, group);
+                    if (firstRow != null)
+                    {
+                        result.put(cd, firstRow);
+                        log.info("cd={} 没有下拉框，使用第一个匹配的row", cd);
+                    }
+                }
+                return result;
             }
 
-            // 2. 遍历下拉框配置，找到匹配的row
+            // 3. 按加工条件種cd分组下拉框
+            Map<String, Map<String, Object>> groupedByTypeCode = new HashMap<>();
             for (Map.Entry<String, Object> entry : selectConfigs.entrySet())
             {
-                String selectProp = entry.getKey();  // "deviceType"
-                Object selectValue = params.get(selectProp);  // "222"
+                String selectProp = entry.getKey();
+                Object selectValue = params.get(selectProp);
 
                 if (selectValue == null)
                 {
@@ -1609,50 +1642,234 @@ public class MonitorDataServiceImpl implements IMonitorDataService
 
                 @SuppressWarnings("unchecked")
                 Map<String, Object> selectConfig = (Map<String, Object>) entry.getValue();
-                String expression = (String) selectConfig.get("expression");  // "001;2;2"
-
-                // 3. 解析下拉框的expression
+                String expression = (String) selectConfig.get("expression");
                 String[] parts = expression.split(";");
-                String targetTypeCode = parts[0];  // "001"
-                int selectSeq = Integer.parseInt(parts[2]);  // 2
+                String typeCode = parts[0];  // 加工条件種cd
 
-                // 4. 找到匹配的row
+                if (!groupedByTypeCode.containsKey(typeCode))
+                {
+                    groupedByTypeCode.put(typeCode, new HashMap<>());
+                }
+                groupedByTypeCode.get(typeCode).put(selectProp, selectConfig);
+
+                log.info("下拉框分组: cd={}, prop={}, value={}", typeCode, selectProp, selectValue);
+            }
+
+            log.info("下拉框按cd分组完成，共 {} 个cd", groupedByTypeCode.size());
+
+            // 记录有下拉框的cd（用于后续区分是"没找到"还是"没下拉框"）
+            java.util.Set<String> cdsWithSelect = new java.util.HashSet<>(groupedByTypeCode.keySet());
+
+            // 4. 对每个cd，找到同时满足所有下拉框的row
+            for (Map.Entry<String, Map<String, Object>> cdEntry : groupedByTypeCode.entrySet())
+            {
+                String targetTypeCode = cdEntry.getKey();
+                Map<String, Object> cdSelectConfigs = cdEntry.getValue();
+
+                log.info("开始匹配cd={}, 该cd下有 {} 个下拉框", targetTypeCode, cdSelectConfigs.size());
+
+                // 遍历所有row，找到同时满足这个cd下所有下拉框的row
                 for (Map<String, String> row : xmlRows)
                 {
-                    // 假设加工条件種cd在第6个位置（item_5）
-                    String rowTypeCode = row.get("item_5");
+                    String rowTypeCode = row.get("item_" + cdIndex);
 
-                    if (targetTypeCode.equals(rowTypeCode))
+                    if (!targetTypeCode.equals(rowTypeCode))
                     {
-                        // 检查该row的序号值是否匹配用户选择
-                        String rowValue = row.get("item_" + (5 + selectSeq));  // item_7 (5+2)
+                        continue;  // cd不匹配，跳过
+                    }
 
-                        if (selectValue.toString().equals(rowValue))
+                    // 检查这个row是否满足当前cd的所有下拉框
+                    boolean allMatch = true;
+                    StringBuilder matchLog = new StringBuilder();
+
+                    for (Map.Entry<String, Object> selectEntry : cdSelectConfigs.entrySet())
+                    {
+                        String selectProp = selectEntry.getKey();
+                        Object selectValue = params.get(selectProp);
+
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> selectConfig = (Map<String, Object>) selectEntry.getValue();
+                        String expression = (String) selectConfig.get("expression");
+                        String[] parts = expression.split(";");
+                        int selectSeq = Integer.parseInt(parts[2]);
+
+                        String rowValue = row.get("item_" + (cdIndex + selectSeq));
+
+                        matchLog.append(String.format(" [%s: 期望=%s, 实际=%s]",
+                            selectProp, selectValue, rowValue));
+
+                        if (!selectValue.toString().equals(rowValue))
                         {
-                            log.info("找到匹配的row: 加工条件種cd={}, 序号{}={}",
-                                    targetTypeCode, selectSeq, rowValue);
-                            return row;
+                            allMatch = false;
+                            break;
+                        }
+                    }
+
+                    if (allMatch)
+                    {
+                        log.info("找到匹配的row: cd={}, 匹配条件:{}", targetTypeCode, matchLog);
+                        result.put(targetTypeCode, row);
+                        break;  // 找到了，处理下一个cd
+                    }
+                }
+
+                if (!result.containsKey(targetTypeCode))
+                {
+                    log.warn("未找到匹配的row: cd={}, 用户选择的下拉框组合不存在", targetTypeCode);
+                }
+            }
+
+            log.info("根据下拉框匹配到 {} 个cd的row", result.size());
+
+            // 5. 补充没有下拉框但配置中需要的cd（注意：有下拉框但没匹配到的cd不在这里处理）
+            for (String cd : allRequiredCds)
+            {
+                if (!result.containsKey(cd))
+                {
+                    // 检查这个cd是否有下拉框
+                    if (cdsWithSelect.contains(cd))
+                    {
+                        // 有下拉框但没匹配到，不应该fallback，跳过
+                        log.warn("cd={} 有下拉框但未找到匹配的row，跳过数据提取", cd);
+                    }
+                    else
+                    {
+                        // 没有下拉框，使用第一个匹配的row
+                        log.info("cd={} 在配置中需要，但没有对应的下拉框，查找第一个匹配的row", cd);
+                        Map<String, String> firstRow = findFirstRowByTypeCode(xmlRows, cd, group);
+                        if (firstRow != null)
+                        {
+                            result.put(cd, firstRow);
+                            log.info("cd={} 使用第一个匹配的row", cd);
+                        }
+                        else
+                        {
+                            log.warn("cd={} 在XML中找不到匹配的row", cd);
                         }
                     }
                 }
             }
 
-            log.warn("未找到匹配的row，返回第一个row");
-            return xmlRows.isEmpty() ? null : xmlRows.get(0);
-
+            log.info("共找到 {} 个cd的匹配row", result.size());
         }
         catch (Exception e)
         {
-            log.error("匹配XML row失败", e);
-            return xmlRows.isEmpty() ? null : xmlRows.get(0);
+            log.error("匹配XML rows失败", e);
+        }
+
+        return result;
+    }
+
+    /**
+     * 收集配置中所有需要的加工条件種cd
+     */
+    private void collectAllRequiredCds(JSONObject configJson, java.util.Set<String> cds)
+    {
+        // 从descItems收集
+        if (configJson.containsKey("descItems"))
+        {
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> descItems = (List<Map<String, Object>>) configJson.get("descItems");
+            for (Map<String, Object> item : descItems)
+            {
+                if ("api".equals(item.get("dataSource")))
+                {
+                    String expression = (String) item.get("expression");
+                    if (expression != null && expression.contains(";"))
+                    {
+                        String cd = expression.split(";")[0];
+                        cds.add(cd);
+                    }
+                }
+            }
+        }
+
+        // 从remarkItems收集
+        if (configJson.containsKey("remarkItems"))
+        {
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> remarkItems = (List<Map<String, Object>>) configJson.get("remarkItems");
+            for (Map<String, Object> item : remarkItems)
+            {
+                if ("api".equals(item.get("dataSource")))
+                {
+                    String expression = (String) item.get("expression");
+                    if (expression != null && expression.contains(";"))
+                    {
+                        String cd = expression.split(";")[0];
+                        cds.add(cd);
+                    }
+                }
+            }
+        }
+
+        // 从tableConfigs收集
+        if (configJson.containsKey("tableConfigs"))
+        {
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> tableConfigs = (List<Map<String, Object>>) configJson.get("tableConfigs");
+            for (Map<String, Object> tableConfig : tableConfigs)
+            {
+                if (tableConfig.containsKey("rows"))
+                {
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> rows = (List<Map<String, Object>>) tableConfig.get("rows");
+                    for (Map<String, Object> row : rows)
+                    {
+                        if ("simple".equals(row.get("rowType")) && "api".equals(row.get("dataSource")))
+                        {
+                            String expression = (String) row.get("expression");
+                            if (expression != null && expression.contains(";"))
+                            {
+                                String cd = expression.split(";")[0];
+                                cds.add(cd);
+                            }
+                        }
+                        else if ("complex".equals(row.get("rowType")) && row.containsKey("subRows"))
+                        {
+                            @SuppressWarnings("unchecked")
+                            List<Map<String, Object>> subRows = (List<Map<String, Object>>) row.get("subRows");
+                            for (Map<String, Object> subRow : subRows)
+                            {
+                                if ("api".equals(subRow.get("dataSource")))
+                                {
+                                    String expression = (String) subRow.get("expression");
+                                    if (expression != null && expression.contains(";"))
+                                    {
+                                        String cd = expression.split(";")[0];
+                                        cds.add(cd);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
     /**
-     * 从XML row中提取配置项的值
+     * 根据加工条件種cd找到第一个匹配的row
+     */
+    private Map<String, String> findFirstRowByTypeCode(List<Map<String, String>> xmlRows, String typeCode, String group)
+    {
+        int cdIndex = getCdIndex(group);
+        for (Map<String, String> row : xmlRows)
+        {
+            String rowTypeCode = row.get("item_" + cdIndex);
+            if (typeCode.equals(rowTypeCode))
+            {
+                return row;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 从XML rows中提取配置项的值（支持多个不同cd的row）
      *
      * @param items 配置项列表
-     * @param xmlRow XML行数据
+     * @param xmlRows XML行数据（按cd分组）
      * @param group 加工条件group
      * @param majorCd 大分类cd
      * @param minorCd 中分类cd
@@ -1660,10 +1877,12 @@ public class MonitorDataServiceImpl implements IMonitorDataService
      */
     private void extractXmlItems(
             List<Map<String, Object>> items,
-            Map<String, String> xmlRow,
+            Map<String, Map<String, String>> xmlRows,
             String group, String majorCd, String minorCd,
             Map<String, Object> result)
     {
+        int cdIndex = getCdIndex(group);
+
         for (Map<String, Object> item : items)
         {
             if (!"api".equals(item.get("dataSource")))
@@ -1682,22 +1901,38 @@ public class MonitorDataServiceImpl implements IMonitorDataService
                 continue;
             }
 
-            String typeCd = parts[0];
+            String typeCd = parts[0];  // 加工条件種cd
             String multiKey = parts[1];
             Integer seq = Integer.parseInt(parts[2]);
 
-            // 1. 查询映射表获取加工条件名称
+            // 1. 根据typeCd获取对应的row
+            Map<String, String> xmlRow = xmlRows.get(typeCd);
+            if (xmlRow == null)
+            {
+                // 尝试使用DEFAULT（用于无下拉框的情况）
+                xmlRow = xmlRows.get("DEFAULT");
+                if (xmlRow == null)
+                {
+                    log.warn("未找到cd={}的匹配row，跳过字段: {}", typeCd, valueKey);
+                    continue;
+                }
+            }
+
+            // 2. 查询映射表获取加工条件名称
             String conditionName = procConditionMappingMapper.findConditionName(
                     group, majorCd, minorCd, typeCd, multiKey, seq
             );
 
-            // 2. 从XML row中提取值
-            // 假设固定字段有6个，序号值从第7个item开始
-            String value = xmlRow.get("item_" + (5 + seq));
+            // 3. 从XML row中提取值
+            // GP项目: cdIndex=5, 数据从item_6开始; 非GP项目: cdIndex=3, 数据从item_4开始
+            String value = xmlRow.get("item_" + (cdIndex + seq));
 
-            log.info("提取字段: {} -> {} (加工条件名称: {})", valueKey, value, conditionName);
+            // 处理空值和NoData
+            value = normalizeXmlValue(value);
 
-            // 3. 存储（使用valueKey）
+            log.info("提取字段: cd={}, {} -> {} (加工条件名称: {})", typeCd, valueKey, value, conditionName);
+
+            // 4. 存储（使用valueKey）
             if (StringUtils.isNotEmpty(valueKey))
             {
                 result.put(valueKey, value);
@@ -1712,11 +1947,11 @@ public class MonitorDataServiceImpl implements IMonitorDataService
     }
 
     /**
-     * 从XML row中提取表格项的值
+     * 从XML rows中提取表格项的值（支持多个不同cd的row）
      */
     private void extractXmlTableItems(
             JSONObject configJson,
-            Map<String, String> xmlRow,
+            Map<String, Map<String, String>> xmlRows,
             String group, String majorCd, String minorCd,
             Map<String, Object> result)
     {
@@ -1742,7 +1977,7 @@ public class MonitorDataServiceImpl implements IMonitorDataService
                     // 简单行
                     if ("api".equals(row.get("dataSource")))
                     {
-                        extractSingleXmlItem(row, xmlRow, group, majorCd, minorCd, result);
+                        extractSingleXmlItem(row, xmlRows, group, majorCd, minorCd, result);
                     }
                 }
                 else if ("complex".equals(rowType))
@@ -1757,7 +1992,7 @@ public class MonitorDataServiceImpl implements IMonitorDataService
                         {
                             if ("api".equals(subRow.get("dataSource")))
                             {
-                                extractSingleXmlItem(subRow, xmlRow, group, majorCd, minorCd, result);
+                                extractSingleXmlItem(subRow, xmlRows, group, majorCd, minorCd, result);
                             }
                         }
                     }
@@ -1767,14 +2002,16 @@ public class MonitorDataServiceImpl implements IMonitorDataService
     }
 
     /**
-     * 提取单个XML项
+     * 提取单个XML项（支持多个不同cd的row）
      */
     private void extractSingleXmlItem(
             Map<String, Object> item,
-            Map<String, String> xmlRow,
+            Map<String, Map<String, String>> xmlRows,
             String group, String majorCd, String minorCd,
             Map<String, Object> result)
     {
+        int cdIndex = getCdIndex(group);
+
         String expression = (String) item.get("expression");
         String valueKey = (String) item.get("valueKey");
 
@@ -1785,20 +2022,38 @@ public class MonitorDataServiceImpl implements IMonitorDataService
             return;
         }
 
-        String typeCd = parts[0];
+        String typeCd = parts[0];  // 加工条件種cd
         String multiKey = parts[1];
         Integer seq = Integer.parseInt(parts[2]);
 
-        // 查询映射表
+        // 1. 根据typeCd获取对应的row
+        Map<String, String> xmlRow = xmlRows.get(typeCd);
+        if (xmlRow == null)
+        {
+            // 尝试使用DEFAULT（用于无下拉框的情况）
+            xmlRow = xmlRows.get("DEFAULT");
+            if (xmlRow == null)
+            {
+                log.warn("未找到cd={}的匹配row，跳过表格字段: {}", typeCd, valueKey);
+                return;
+            }
+        }
+
+        // 2. 查询映射表
         String conditionName = procConditionMappingMapper.findConditionName(
                 group, majorCd, minorCd, typeCd, multiKey, seq
         );
 
-        // 从XML row中提取值
-        String value = xmlRow.get("item_" + (5 + seq));
+        // 3. 从XML row中提取值
+        // GP项目: cdIndex=5, 数据从item_6开始; 非GP项目: cdIndex=3, 数据从item_4开始
+        String value = xmlRow.get("item_" + (cdIndex + seq));
 
-        log.info("提取表格字段: {} -> {} (加工条件名称: {})", valueKey, value, conditionName);
+        // 处理空值和NoData
+        value = normalizeXmlValue(value);
 
+        log.info("提取表格字段: cd={}, {} -> {} (加工条件名称: {})", typeCd, valueKey, value, conditionName);
+
+        // 4. 存储
         if (StringUtils.isNotEmpty(valueKey))
         {
             result.put(valueKey, value);
@@ -1839,15 +2094,18 @@ public class MonitorDataServiceImpl implements IMonitorDataService
             String group = configJson.getString("procConditionGroup");
             String majorCd = configJson.getString("majorClassCd");
             String minorCd = configJson.getString("minorClassCd");
+            boolean isGpProject = "02".equals(group);
+            int cdIndex = getCdIndex(group);
 
-            log.info("基础配置: group={}, majorCd={}, minorCd={}", group, majorCd, minorCd);
+            log.info("基础配置: group={}, majorCd={}, minorCd={}, isGpProject={}, cdIndex={}",
+                     group, majorCd, minorCd, isGpProject, cdIndex);
 
             // 4. 构建XML请求体
             params.put("majorClassCd", majorCd);
             params.put("minorClassCd", minorCd);
 
             String xmlRequest;
-            if ("02".equals(group))
+            if (isGpProject)
             {
                 // GP项目
                 xmlRequest = com.ruoyi.monitor.utils.XmlParser.buildGpXmlRequest(params);
@@ -1888,9 +2146,16 @@ public class MonitorDataServiceImpl implements IMonitorDataService
             List<Map<String, String>> xmlRows = com.ruoyi.monitor.utils.XmlParser.parseXmlResponse(xmlResponse);
             log.info("解析XML，共 {} 个row", xmlRows.size());
 
+            // 6.5 清理XML rows（非GP项目按固定位置移除分隔符）
+            List<Map<String, String>> cleanedXmlRows = new ArrayList<>();
+            for (Map<String, String> row : xmlRows)
+            {
+                cleanedXmlRows.add(cleanXmlRowIfNeeded(row, isGpProject));
+            }
+
             // 7. 缓存XML数据（用于后续查询时直接使用，避免重复调用API）
             String cacheKey = xmlDataCache.generateCacheKey(configKey, params);
-            xmlDataCache.put(cacheKey, xmlRows);
+            xmlDataCache.put(cacheKey, cleanedXmlRows);
             log.info("已缓存XML数据，cacheKey: {}", cacheKey);
 
             // 8. 处理下拉框配置
@@ -1921,14 +2186,14 @@ public class MonitorDataServiceImpl implements IMonitorDataService
 
                         // 提取选项值
                         java.util.Set<String> options = new java.util.LinkedHashSet<>();
-                        for (Map<String, String> row : xmlRows)
+                        for (Map<String, String> row : cleanedXmlRows)
                         {
-                            // 假设加工条件種cd在第6个位置（item_5）
-                            String rowTypeCode = row.get("item_5");
+                            // GP项目: cd在item_5; 非GP项目: cd在item_3
+                            String rowTypeCode = row.get("item_" + cdIndex);
                             if (targetTypeCode.equals(rowTypeCode))
                             {
-                                // 计算序号值的位置：固定字段数(6) + 序号位置
-                                String optionValue = row.get("item_" + (5 + itemSeq));
+                                // 计算序号值的位置：cdIndex + 序号
+                                String optionValue = row.get("item_" + (cdIndex + itemSeq));
                                 if (StringUtils.isNotEmpty(optionValue))
                                 {
                                     options.add(optionValue);
@@ -1952,6 +2217,112 @@ public class MonitorDataServiceImpl implements IMonitorDataService
         }
 
         return result;
+    }
+
+    /**
+     * 获取加工条件种cd的索引位置
+     * GP项目：item_5，非GP项目：item_3
+     */
+    private int getCdIndex(String group)
+    {
+        return "02".equals(group) ? 5 : 3;
+    }
+
+    /**
+     * 获取数据起始索引位置
+     * GP项目：item_6，非GP项目：item_4
+     */
+    private int getDataStartIndex(String group)
+    {
+        return "02".equals(group) ? 6 : 4;
+    }
+
+    /**
+     * 清理非GP项目XML的固定位置分隔符
+     *
+     * <p>非GP项目XML格式固定：
+     * <ul>
+     *   <li>item_0 ~ item_3: 固定字段（4个）</li>
+     *   <li>item_4, item_6, item_8...: 真实值（偶数索引）</li>
+     *   <li>item_5, item_7, item_9...: 分隔符（奇数索引，值不固定，可能是9、;、,等）</li>
+     * </ul>
+     *
+     * <p>清理策略：直接跳过奇数索引位置，不关心分隔符的具体值
+     *
+     * @param row 原始XML row
+     * @param isGpProject 是否是GP项目（GP项目无分隔符，直接返回原row）
+     * @return 清理后的row
+     */
+    private Map<String, String> cleanXmlRowIfNeeded(Map<String, String> row, boolean isGpProject)
+    {
+        if (row == null || row.isEmpty())
+        {
+            return row;
+        }
+
+        // GP项目没有分隔符，直接返回
+        if (isGpProject)
+        {
+            return row;
+        }
+
+        // 非GP项目：分隔符位置固定在奇数索引（item_5, item_7, item_9...），直接跳过
+        Map<String, String> cleanedRow = new HashMap<>();
+
+        // 1. 复制固定字段（item_0 到 item_3）
+        for (int i = 0; i <= 3; i++)
+        {
+            String value = row.get("item_" + i);
+            if (value != null)
+            {
+                cleanedRow.put("item_" + i, value);
+            }
+        }
+
+        // 2. 只复制偶数索引的数据（跳过奇数索引的分隔符）
+        //    原始：item_4=值1, item_5=分隔符, item_6=值2, item_7=分隔符...
+        //    结果：item_4=值1, item_5=值2, item_6=值3...
+        int targetIndex = 4;
+        for (int i = 4; i < 100; i += 2)  // i += 2 只遍历偶数索引
+        {
+            String value = row.get("item_" + i);
+            if (value == null)
+            {
+                break;
+            }
+            cleanedRow.put("item_" + targetIndex, value);
+            targetIndex++;
+        }
+
+        log.debug("清理非GP项目XML分隔符: {}个字段 → {}个字段", row.size(), cleanedRow.size());
+
+        return cleanedRow;
+    }
+
+    /**
+     * 标准化XML值，处理空值和NoData
+     *
+     * @param value XML中提取的原始值
+     * @return 标准化后的值，如果是空或NoData则返回null
+     */
+    private String normalizeXmlValue(String value)
+    {
+        // null或空字符串
+        if (value == null || value.trim().isEmpty())
+        {
+            return null;
+        }
+
+        // 去除前后空格
+        String trimmedValue = value.trim();
+
+        // 如果是"NoData"（不区分大小写），返回null
+        if ("NoData".equalsIgnoreCase(trimmedValue))
+        {
+            return null;
+        }
+
+        return trimmedValue;
     }
 }
 

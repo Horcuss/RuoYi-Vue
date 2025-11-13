@@ -1,0 +1,191 @@
+{
+  "apiUrl": "http://localhost:8080/api/xmltest/test_lcp_001",
+  "procConditionGroup": "02",
+  "majorClassCd": "001",
+  "minorClassCd": "N01",
+  "formItems": [
+    {
+      "label": "LCP品名",
+      "prop": "lcpName",
+      "type": "input"
+    },
+    {
+      "label": "工程系列",
+      "prop": "engineeringSeries",
+      "type": "select",
+      "dataSource": "xml",
+      "expression": "001;2;1"
+    },
+    {
+      "label": "型号",
+      "prop": "model",
+      "type": "select",
+      "dataSource": "xml",
+      "expression": "001;2;2"
+    },
+    {
+      "label": "类型",
+      "prop": "type",
+      "type": "select",
+      "dataSource": "xml",
+      "expression": "001;2;3"
+    },
+    {
+      "label": "版本",
+      "prop": "version",
+      "type": "select",
+      "dataSource": "xml",
+      "expression": "001;2;4"
+    }
+  ],
+  "descItems": [
+    {
+      "label": "LCP品名(cd=001,seq=1)",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;1",
+      "valueKey": "lcpName"
+    },
+    {
+      "label": "工程系列(cd=001,seq=1)",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;2",
+      "valueKey": "engineeringSeries"
+    },
+    {
+      "label": "型号(cd=001,seq=2)",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;3",
+      "valueKey": "model"
+    },
+    {
+      "label": "类型(cd=001,seq=3)",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;4",
+      "valueKey": "type"
+    },
+    {
+      "label": "版本(cd=001,seq=4)",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;5",
+      "valueKey": "version"
+    },
+    {
+      "label": "温度(cd=001,seq=5)",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;6",
+      "valueKey": "temperature"
+    },
+    {
+      "label": "速度(cd=001,seq=6)",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "001;3;7",
+      "valueKey": "speed"
+    },
+    {
+      "label": "平均温速(API-Computed)",
+      "dataSource": "api",
+      "displayType": "computed",
+      "expression": "(temperature + speed) / 2",
+      "valueKey": "avgTempSpeed"
+    },
+    {
+      "label": "数据库字段测试",
+      "dataSource": "database",
+      "displayType": "direct",
+      "expression": "SELECT operator_name FROM lcp_production WHERE lcp_name = :lcpName",
+      "valueKey": "operatorName"
+    }
+  ],
+  "remarkItems": [
+    {
+      "title": "工艺说明(cd=003)",
+      "dataSource": "api",
+      "displayType": "direct",
+      "expression": "003;3;1",
+      "valueKey": "processNote"
+    },
+    {
+      "title": "质量标准(Database)",
+      "dataSource": "database",
+      "displayType": "direct",
+      "expression": "SELECT quality_standard FROM lcp_standards WHERE lcp_name = :lcpName",
+      "valueKey": "qualityStandard"
+    }
+  ],
+  "tableConfigs": [
+    {
+      "rowHeader": "印刷检查",
+      "rows": [
+        {
+          "rowType": "simple",
+          "projectName": "LCP处置项次(cd=002,seq=1)",
+          "unit": "",
+          "dataSource": "api",
+          "displayType": "direct",
+          "expression": "002;3;1",
+          "valueKey": "disposalTimes"
+        },
+        {
+          "rowType": "simple",
+          "projectName": "印刷方式(cd=002,seq=2)",
+          "unit": "",
+          "dataSource": "api",
+          "displayType": "direct",
+          "expression": "002;3;2",
+          "valueKey": "printMethod"
+        },
+        {
+          "rowType": "simple",
+          "projectName": "LCP量(cd=002,seq=5)",
+          "unit": "um",
+          "dataSource": "api",
+          "displayType": "direct",
+          "expression": "002;3;5",
+          "valueKey": "lcpAmount"
+        }
+      ]
+    },
+    {
+      "rowHeader": "尺寸检查",
+      "rows": [
+        {
+          "rowType": "complex",
+          "projectName": "基准精度/尺度",
+          "subRows": [
+            {
+              "subName": "L",
+              "unit": "um",
+              "dataSource": "database",
+              "displayType": "direct",
+              "expression": "SELECT precision_l FROM lcp_dimension WHERE lcp_name = :lcpName",
+              "valueKey": "precisionL"
+            },
+            {
+              "subName": "W",
+              "unit": "um",
+              "dataSource": "database",
+              "displayType": "direct",
+              "expression": "SELECT precision_w FROM lcp_dimension WHERE lcp_name = :lcpName",
+              "valueKey": "precisionW"
+            },
+            {
+              "subName": "H",
+              "unit": "um",
+              "dataSource": "api",
+              "displayType": "direct",
+              "expression": "004;3;1",
+              "valueKey": "precisionH"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficParam>
+  <pattern>
+    <!-- ========================================= -->
+    <!-- cd=001: 基本信息（包含下拉框和显示字段） -->
+    <!-- multiKey=2: 用于下拉框选项 -->
+    <!-- multiKey=3: 用于显示字段 -->
+    <!-- ========================================= -->
+
+    <!-- 第1组：设备A相关数据 -->
+    <row>
+      <item>02</item>              <!-- item_0: procConditionGroup -->
+      <item>品名1111</item>        <!-- item_1: 品名（固定） -->
+      <item>工程系列A</item>       <!-- item_2: 工程系列（固定） -->
+      <item>001</item>             <!-- item_3: 大分类cd -->
+      <item>N01</item>             <!-- item_4: 中分类cd -->
+      <item>001</item>             <!-- item_5: 加工条件种cd ✅ -->
+
+      <!-- multiKey=2: 下拉框数据（seq从1开始） -->
+      <item>品名1111</item>        <!-- item_6: seq=1 品名 -->
+      <item>设备A</item>           <!-- item_7: seq=2 设备类型（下拉框） -->
+      <item>型号A1</item>          <!-- item_8: seq=3 设备型号（下拉框） -->
+      <item>V1.0</item>            <!-- item_9: seq=4 设备版本（下拉框） -->
+
+      <!-- multiKey=3: 显示字段数据 -->
+      <item>品名1111</item>        <!-- item_10: seq=1 品名 -->
+      <item>设备A</item>           <!-- item_11: seq=2 设备类型 -->
+      <item>型号A1</item>          <!-- item_12: seq=3 设备型号 -->
+      <item>V1.0</item>            <!-- item_13: seq=4 设备版本 -->
+      <item>25.5</item>            <!-- item_14: seq=5 温度 -->
+      <item>60</item>              <!-- item_15: seq=6 湿度 -->
+      <item>2.5</item>             <!-- item_16: seq=7 速度 -->
+      <item>良好</item>            <!-- item_17: seq=8 状态 -->
+      <item>正常运行</item>        <!-- item_18: seq=9 备注 -->
+      <item>额外字段A1</item>      <!-- item_19: seq=10 不在下拉框范围的字段 -->
+    </row>
+
+    <!-- 第2组：设备A的另一个版本 -->
+    <row>
+      <item>02</item>
+      <item>品名1111</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>001</item>
+
+      <item>品名1111</item>
+      <item>设备A</item>
+      <item>型号A1</item>
+      <item>V2.0</item>            <!-- 不同版本 -->
+
+      <item>品名1111</item>
+      <item>设备A</item>
+      <item>型号A1</item>
+      <item>V2.0</item>
+      <item>26.0</item>
+      <item>65</item>
+      <item>2.8</item>
+      <item>良好</item>
+      <item>升级版本</item>
+      <item>额外字段A2</item>
+    </row>
+
+    <!-- 第3组：设备B的数据 -->
+    <row>
+      <item>02</item>
+      <item>品名1111</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>001</item>
+
+      <item>品名1111</item>
+      <item>设备B</item>           <!-- 不同设备类型 -->
+      <item>型号B1</item>
+      <item>V1.0</item>
+
+      <item>品名1111</item>
+      <item>设备B</item>
+      <item>型号B1</item>
+      <item>V1.0</item>
+      <item>27.0</item>
+      <item>70</item>
+      <item>3.0</item>
+      <item>优秀</item>
+      <item>高性能设备</item>
+      <item>额外字段B1</item>
+    </row>
+
+    <!-- 第4组：设备C的数据 -->
+    <row>
+      <item>02</item>
+      <item>品名1111</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>001</item>
+
+      <item>品名1111</item>
+      <item>设备C</item>
+      <item>型号C1</item>
+      <item>V1.0</item>
+
+      <item>品名1111</item>
+      <item>设备C</item>
+      <item>型号C1</item>
+      <item>V1.0</item>
+      <item>24.5</item>
+      <item>55</item>
+      <item>2.2</item>
+      <item>正常</item>
+      <item>标准设备</item>
+      <item>额外字段C1</item>
+    </row>
+
+    <!-- ========================================= -->
+    <!-- cd=002: 工序相关数据 -->
+    <!-- multiKey=2: 用于下拉框选项 -->
+    <!-- multiKey=3: 用于显示字段 -->
+    <!-- ========================================= -->
+
+    <row>
+      <item>02</item>
+      <item>品名1111</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>002</item>             <!-- item_5: cd=002 -->
+
+      <!-- multiKey=2: 下拉框数据 -->
+      <item>工序数据1</item>       <!-- item_6: seq=1 -->
+      <item>印刷</item>            <!-- item_7: seq=2 工序（下拉框） -->
+
+      <!-- multiKey=3: 显示字段数据 -->
+      <item>工序数据1</item>       <!-- item_8: seq=1 -->
+      <item>印刷</item>            <!-- item_9: seq=2 工序名称 -->
+      <item>第3次</item>           <!-- item_10: seq=3 处置项次 -->
+      <item>丝网印刷</item>        <!-- item_11: seq=4 印刷方式 -->
+      <item>2.5m/min</item>        <!-- item_12: seq=5 速度(cd=002) -->
+      <item>180秒</item>           <!-- item_13: seq=6 三温炉时间 -->
+      <item>15.5um</item>          <!-- item_14: seq=7 厚度 -->
+    </row>
+
+    <row>
+      <item>02</item>
+      <item>品名1111</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>002</item>
+
+      <item>工序数据2</item>
+      <item>贴合</item>            <!-- 不同工序 -->
+
+      <item>工序数据2</item>
+      <item>贴合</item>
+      <item>第2次</item>
+      <item>真空贴合</item>
+      <item>1.8m/min</item>
+      <item>120秒</item>
+      <item>12.0um</item>
+    </row>
+
+    <row>
+      <item>02</item>
+      <item>品名1111</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>002</item>
+
+      <item>工序数据3</item>
+      <item>检查</item>
+
+      <item>工序数据3</item>
+      <item>检查</item>
+      <item>第1次</item>
+      <item>目视检查</item>
+      <item>0.5m/min</item>
+      <item>60秒</item>
+      <item>N/A</item>
+    </row>
+
+    <!-- ========================================= -->
+    <!-- cd=003: 质检标准（无下拉框，只有显示字段） -->
+    <!-- ========================================= -->
+
+    <row>
+      <item>02</item>
+      <item>品名1111</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>003</item>             <!-- item_5: cd=003 -->
+
+      <!-- multiKey=3: 只有显示字段，无下拉框数据 -->
+      <item>质检项目</item>        <!-- item_6: seq=1 -->
+      <item>国标GB/T1234-2020</item> <!-- item_7: seq=2 质检标准 -->
+      <item>合格</item>            <!-- item_8: seq=3 质检结果 -->
+      <item>2024-01-14</item>      <!-- item_9: seq=4 检查日期 -->
+      <item>张三</item>            <!-- item_10: seq=5 检查员 -->
+    </row>
+
+    <!-- ========================================= -->
+    <!-- cd=004: 不存在的cd（测试用） -->
+    <!-- 用户配置中有cd=004，但XML中没有对应数据 -->
+    <!-- ========================================= -->
+
+  </pattern>
+
+  <result>1</result>
+  <resultMessage>获取成功</resultMessage>
+  <resultMessageId></resultMessageId>
+</trafficParam>

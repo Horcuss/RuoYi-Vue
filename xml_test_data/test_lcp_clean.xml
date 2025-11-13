@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficParam>
+  <pattern>
+    <!-- ====================== -->
+    <!-- 第1行：加工条件种cd=001 -->
+    <!-- 用途：基本信息 -->
+    <!-- ====================== -->
+    <row>
+      <item>02</item>              <!-- item_0: procConditionGroup -->
+      <item>LCP-2024-A</item>      <!-- item_1: 品名（固定） -->
+      <item>工程系列X</item>        <!-- item_2: 工程系列（固定） -->
+      <item>001</item>              <!-- item_3: 大分类cd -->
+      <item>N01</item>              <!-- item_4: 中分类cd -->
+      <item>001</item>              <!-- item_5: 加工条件种cd ✅ -->
+      <item>LCP-2024-A</item>      <!-- item_6: seq=1 LCP品名 -->
+      <item>工程系列A</item>        <!-- item_7: seq=2, multiKey=1 工程系列 -->
+      <item>A型</item>              <!-- item_8: seq=2, multiKey=2 型号 -->
+      <item>A1型</item>             <!-- item_9: seq=2, multiKey=3 类型 -->
+      <item>V1.0</item>             <!-- item_10: seq=2, multiKey=4 版本 -->
+      <item>25.5</item>             <!-- item_11: seq=2, multiKey=5 温度 -->
+      <item>60</item>               <!-- item_12: seq=2, multiKey=6 速度 -->
+    </row>
+
+    <!-- 另一个版本的数据 -->
+    <row>
+      <item>02</item>
+      <item>LCP-2024-A</item>
+      <item>工程系列X</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>001</item>              <!-- 加工条件种cd -->
+      <item>LCP-2024-A</item>      <!-- LCP品名 -->
+      <item>工程系列A</item>
+      <item>A型</item>
+      <item>A1型</item>
+      <item>V2.0</item>             <!-- 不同版本 -->
+      <item>26.0</item>
+      <item>65</item>
+    </row>
+
+    <!-- 工程系列B的数据 -->
+    <row>
+      <item>02</item>
+      <item>LCP-2024-A</item>
+      <item>工程系列X</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>001</item>
+      <item>LCP-2024-A</item>
+      <item>工程系列B</item>        <!-- 不同工程系列 -->
+      <item>B型</item>
+      <item>B1型</item>
+      <item>V1.0</item>
+      <item>27.0</item>
+      <item>70</item>
+    </row>
+
+    <!-- ====================== -->
+    <!-- 第2行：加工条件种cd=002 -->
+    <!-- 用途：印刷检查数据 -->
+    <!-- ====================== -->
+    <row>
+      <item>02</item>
+      <item>LCP-2024-A</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>002</item>              <!-- item_5: 加工条件种cd=002 ✅ -->
+      <item>第3次</item>            <!-- item_6: seq=1 处置项次 -->
+      <item>丝网印刷</item>         <!-- item_7: seq=2 印刷方式 -->
+      <item>180秒</item>            <!-- item_8: seq=3 三温炉时间 -->
+      <item>2.5m/min</item>         <!-- item_9: seq=4 速度 -->
+      <item>15.5</item>             <!-- item_10: seq=5 LCP量 -->
+    </row>
+
+    <!-- ====================== -->
+    <!-- 第3行：加工条件种cd=003 -->
+    <!-- 用途：工艺说明 -->
+    <!-- ====================== -->
+    <row>
+      <item>02</item>
+      <item>LCP-2024-A</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>003</item>              <!-- item_5: 加工条件种cd=003 ✅ -->
+      <item>采用标准工艺流程，注意温度控制在25-27℃范围内，速度保持匀速。印刷前需预热设备，确保印刷质量。</item>  <!-- seq=1 工艺说明 -->
+    </row>
+
+    <!-- ====================== -->
+    <!-- 第4行：加工条件种cd=004 -->
+    <!-- 用途：额外的检查项 -->
+    <!-- ====================== -->
+    <row>
+      <item>02</item>
+      <item>LCP-2024-A</item>
+      <item>工程系列A</item>
+      <item>001</item>
+      <item>N01</item>
+      <item>004</item>
+      <item>合格</item>             <!-- 外观检查 -->
+      <item>通过</item>             <!-- 强度测试 -->
+      <item>OK</item>               <!-- 附着力测试 -->
+    </row>
+  </pattern>
+
+  <result>1</result>
+  <resultMessage>获取成功</resultMessage>
+  <resultMessageId></resultMessageId>
+</trafficParam>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficParam>
+  <pattern>
+    <!-- ========================================= -->
+    <!-- cd=001: 基本信息 -->
+    <!-- 非GP项目格式：偶数索引是值，奇数索引是分隔符"9" -->
+    <!-- ========================================= -->
+
+    <!-- 第1组数据：工程系列A, 型号A1, 版本V1.0 -->
+    <row>
+      <item>01</item>                      <!-- item_0: procConditionGroup -->
+      <item>LCP-2024-A</item>              <!-- item_1: 品名（固定字段） -->
+      <item>N01</item>                     <!-- item_2: 中分类cd -->
+      <item>001</item>                     <!-- item_3: 加工条件种cd ✅ -->
+
+      <item>LCP-2024-A</item>              <!-- item_4: seq=1 LCP品名 -->
+      <item>9</item>                       <!-- item_5: 分隔符 -->
+      <item>工程系列A</item>                <!-- item_6: seq=2 工程系列（下拉框） -->
+      <item>9</item>                       <!-- item_7: 分隔符 -->
+      <item>型号A1</item>                  <!-- item_8: seq=3 型号（下拉框） -->
+      <item>9</item>                       <!-- item_9: 分隔符 -->
+      <item>V1.0</item>                    <!-- item_10: seq=4 版本（下拉框） -->
+      <item>9</item>                       <!-- item_11: 分隔符 -->
+      <item>25.5</item>                    <!-- item_12: seq=5 温度 -->
+      <item>9</item>                       <!-- item_13: 分隔符 -->
+      <item>60</item>                      <!-- item_14: seq=6 速度 -->
+      <item>9</item>                       <!-- item_15: 分隔符 -->
+    </row>
+
+    <!-- 第2组数据：工程系列A, 型号A1, 版本V2.0 -->
+    <row>
+      <item>01</item>
+      <item>LCP-2024-A</item>
+      <item>N01</item>
+      <item>001</item>
+
+      <item>LCP-2024-A</item>
+      <item>9</item>
+      <item>工程系列A</item>
+      <item>9</item>
+      <item>型号A1</item>
+      <item>9</item>
+      <item>V2.0</item>                    <!-- 不同版本 -->
+      <item>9</item>
+      <item>26.0</item>
+      <item>9</item>
+      <item>65</item>
+      <item>9</item>
+    </row>
+
+    <!-- 第3组数据：工程系列B, 型号B1, 版本V1.0 -->
+    <row>
+      <item>01</item>
+      <item>LCP-2024-A</item>
+      <item>N01</item>
+      <item>001</item>
+
+      <item>LCP-2024-A</item>
+      <item>9</item>
+      <item>工程系列B</item>                <!-- 不同工程系列 -->
+      <item>9</item>
+      <item>型号B1</item>                  <!-- 不同型号 -->
+      <item>9</item>
+      <item>V1.0</item>
+      <item>9</item>
+      <item>27.0</item>
+      <item>9</item>
+      <item>70</item>
+      <item>9</item>
+    </row>
+
+    <!-- ========================================= -->
+    <!-- cd=002: 印刷检查数据 -->
+    <!-- ========================================= -->
+
+    <row>
+      <item>01</item>
+      <item>LCP-2024-A</item>
+      <item>N01</item>
+      <item>002</item>                     <!-- item_3: cd=002 -->
+
+      <item>第3次</item>                   <!-- item_4: seq=1 处置项次 -->
+      <item>9</item>
+      <item>丝网印刷</item>                <!-- item_6: seq=2 印刷方式 -->
+      <item>9</item>
+      <item>180秒</item>                   <!-- item_8: seq=3 三温炉时间 -->
+      <item>9</item>
+      <item>2.5m/min</item>                <!-- item_10: seq=4 速度 -->
+      <item>9</item>
+      <item>15.5</item>                    <!-- item_12: seq=5 LCP量 -->
+      <item>9</item>
+    </row>
+
+    <!-- ========================================= -->
+    <!-- cd=003: 工艺说明 -->
+    <!-- ========================================= -->
+
+    <row>
+      <item>01</item>
+      <item>LCP-2024-A</item>
+      <item>N01</item>
+      <item>003</item>                     <!-- item_3: cd=003 -->
+
+      <item>采用标准工艺流程，温度控制在25-27℃，速度保持匀速。印刷前需预热设备。</item>
+      <item>9</item>
+    </row>
+
+    <!-- ========================================= -->
+    <!-- cd=004: 尺寸检查 -->
+    <!-- ========================================= -->
+
+    <row>
+      <item>01</item>
+      <item>LCP-2024-A</item>
+      <item>N01</item>
+      <item>004</item>                     <!-- item_3: cd=004 -->
+
+      <item>120.5</item>                   <!-- item_4: seq=1 精度L -->
+      <item>9</item>
+      <item>80.2</item>                    <!-- item_6: seq=2 精度W -->
+      <item>9</item>
+      <item>50.8</item>                    <!-- item_8: seq=3 精度H -->
+      <item>9</item>
+    </row>
+
+  </pattern>
+  <result>1</result>
+  <resultMessage>获取成功</resultMessage>
+  <resultMessageId></resultMessageId>
+</trafficParam>
