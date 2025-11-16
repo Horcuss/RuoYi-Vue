@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficParam>
+  <pattern>
+    <!-- ========================================= -->
+    <!-- LCP项目完整测试数据 (procConditionGroup=01) -->
+    <!-- 非GP项目格式：item之间有分隔符，需要清理 -->
+    <!-- ========================================= -->
+    
+    <!-- cd=001: 基础加工条件 - 多个下拉框选项 -->
+    <!-- 第1组：X系列加工，多下拉框联动测试 -->
+    <row>
+      <item>01</item>                      <!-- item_0: procConditionGroup -->
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>加工系列X</item>                <!-- item_2: 加工系列（下拉框1） -->
+      <item>001</item>                     <!-- item_3: 加工条件种cd ✅ -->
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>分隔符1</item>
+      <item>X型设备</item>                 <!-- item_5->4: 设备类型（下拉框2） -->
+      <item>分隔符2</item>                 <!-- item_6: 分隔符（会被清理） -->
+      <item>X1型号</item>                  <!-- item_7->5: 设备型号（下拉框3） -->
+      <item>分隔符3</item>                 <!-- item_8: 分隔符（会被清理） -->
+      <item>Ver1.0</item>                  <!-- item_9->6: 设备版本（下拉框4） -->
+      <item>分隔符4</item>                 <!-- item_10: 分隔符（会被清理） -->
+      <item>85.5</item>                    <!-- item_11->7: 加工温度 -->
+      <item>分隔符5</item>                 <!-- item_12: 分隔符（会被清理） -->
+      <item>12.5</item>                    <!-- item_13->8: 加工速度 -->
+      <item>分隔符6</item>                 <!-- item_14: 分隔符（会被清理） -->
+      <item>LCP原料A</item>                <!-- item_15->9: 原料类型 -->
+      <item>分隔符7</item>                 <!-- item_16: 分隔符（会被清理） -->
+      <item>额外数据X1</item>              <!-- item_17->10: 额外字段 -->
+      <item>分隔符8</item>                 <!-- item_18: 分隔符（会被清理） -->
+    </row>
+    
+    <!-- 第2组：X系列的不同型号组合 -->
+    <row>
+      <item>01</item>
+      <item>LCP-TEST-001</item>
+      <item>加工系列X</item>                <!-- 相同系列 -->
+      <item>001</item>
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>分隔符1</item>
+      <item>X型设备</item>                 <!-- 相同设备类型 -->
+      <item>分隔符2</item>
+      <item>X2型号</item>                  <!-- 不同型号 -->
+      <item>分隔符3</item>
+      <item>Ver1.5</item>                  <!-- 不同版本 -->
+      <item>分隔符4</item>
+      <item>88.0</item>
+      <item>分隔符5</item>
+      <item>15.0</item>
+      <item>分隔符6</item>
+      <item>LCP原料B</item>
+      <item>分隔符7</item>
+      <item>额外数据X2</item>
+      <item>分隔符8</item>                 <!-- item_18: 分隔符（会被清理） -->
+    </row>
+    
+    <!-- 第3组：Y系列加工，不同的系列选项 -->
+    <row>
+      <item>01</item>
+      <item>LCP-TEST-001</item>
+      <item>加工系列Y</item>                <!-- 不同系列 -->
+      <item>001</item>
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>分隔符1</item>
+      <item>Y型设备</item>                 <!-- Y系列设备 -->
+      <item>分隔符2</item>
+      <item>Y1型号</item>                  <!-- Y系列型号 -->
+      <item>分隔符3</item>
+      <item>Ver2.0</item>                  <!-- Y系列版本 -->
+      <item>分隔符4</item>
+      <item>92.0</item>
+      <item>分隔符5</item>
+      <item>18.5</item>
+      <item>分隔符6</item>
+      <item>LCP原料C</item>
+      <item>分隔符7</item>
+      <item>额外数据Y1</item>
+      <item>分隔符8</item>                 <!-- item_18: 分隔符（会被清理） -->
+    </row>
+    
+    <!-- cd=002: 检测工序 - 单个下拉框 -->
+    <!-- 第1组：温度检测 -->
+    <row>
+      <item>01</item>
+      <item>LCP-TEST-001</item>
+      <item>检测类型A</item>                <!-- item_2: 检测类型（下拉框1） -->
+      <item>002</item>                     <!-- item_3: 加工条件种cd ✅ -->
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>分隔符1</item>
+      <item>温度检测</item>                 <!-- item_5->4: 检测项目（无下拉框） -->
+      <item>分隔符2</item>
+      <item>标准检测</item>                 <!-- item_7->5: 检测标准（无下拉框） -->
+      <item>分隔符3</item>
+      <item>检测完成</item>                 <!-- item_9->6: 检测状态（无下拉框） -->
+      <item>分隔符4</item>
+      <item>156.8</item>                   <!-- item_11->7: 检测温度 -->
+      <item>分隔符5</item>
+      <item>25.5</item>                    <!-- item_13->8: 检测时间 -->
+      <item>分隔符6</item>
+      <item>合格</item>                    <!-- item_15->9: 检测结果 -->
+      <item>分隔符7</item>
+      <item>检测员甲</item>                 <!-- item_17->10: 检测员 -->
+      <item>分隔符8</item>                 <!-- item_18: 分隔符（会被清理） -->
+    </row>
+    
+    <!-- 第2组：压力检测 -->
+    <row>
+      <item>01</item>
+      <item>LCP-TEST-001</item>
+      <item>检测类型B</item>                <!-- 不同检测类型 -->
+      <item>002</item>
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>分隔符1</item>
+      <item>压力检测</item>
+      <item>分隔符2</item>
+      <item>高精度检测</item>
+      <item>分隔符3</item>
+      <item>检测中</item>
+      <item>分隔符4</item>
+      <item>45.6</item>                    <!-- 压力值 -->
+      <item>分隔符5</item>
+      <item>30.2</item>
+      <item>分隔符6</item>
+      <item>待定</item>
+      <item>分隔符7</item>
+      <item>检测员乙</item>
+      <item>分隔符8</item>                 <!-- item_18: 分隔符（会被清理） -->
+    </row>
+    
+    <!-- cd=003: 封装工序 - 无下拉框 -->
+    <!-- 所有字段都是直接显示 -->
+    <row>
+      <item>01</item>
+      <item>LCP-TEST-001</item>
+      <item>封装线A</item>                  <!-- item_2: 封装线（无下拉框） -->
+      <item>003</item>                     <!-- item_3: 加工条件种cd ✅ -->
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>分隔符1</item>
+      <item>标准封装</item>                 <!-- item_5->4: 封装类型 -->
+      <item>分隔符2</item>
+      <item>塑料封装</item>                 <!-- item_7->5: 封装材料 -->
+      <item>分隔符3</item>
+      <item>100</item>                     <!-- item_9->6: 封装数量 -->
+      <item>分隔符4</item>
+      <item>2.8</item>                     <!-- item_11->7: 封装厚度 -->
+      <item>分隔符5</item>
+      <item>良好</item>                    <!-- item_13->8: 封装状态 -->
+      <item>分隔符6</item>
+      <item>已标记</item>                  <!-- item_15->9: 标记状态 -->
+      <item>分隔符7</item>
+      <item>封装员A</item>                 <!-- item_17->10: 封装员 -->
+      <item>分隔符8</item>                 <!-- item_18: 分隔符（会被清理） -->
+    </row>
+    
+    <!-- cd=004: 物流工序 - 混合场景 -->
+    <row>
+      <item>01</item>
+      <item>LCP-TEST-001</item>
+      <item>物流模式A</item>                <!-- item_2: 物流模式（下拉框） -->
+      <item>004</item>                     <!-- item_3: 加工条件种cd ✅ -->
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>分隔符1</item>
+      <item>快递配送</item>                 <!-- item_5->4: 配送方式（无下拉框） -->
+      <item>分隔符2</item>
+      <item>顺丰速运</item>                 <!-- item_7->5: 配送公司（无下拉框） -->
+      <item>分隔符3</item>
+      <item>广州</item>                    <!-- item_9->6: 目的城市（无下拉框） -->
+      <item>分隔符4</item>
+      <item>350</item>                     <!-- item_11->7: 配送距离 -->
+      <item>分隔符5</item>
+      <item>24</item>                      <!-- item_13->8: 预计小时 -->
+      <item>分隔符6</item>
+      <item>配送中</item>                  <!-- item_15->9: 配送状态 -->
+      <item>分隔符7</item>
+      <item>物流员甲</item>                 <!-- item_17->10: 物流员 -->
+      <item>分隔符8</item>                 <!-- item_18: 分隔符（会被清理） -->
+    </row>
+    
+    <!-- 物流模式B -->
+    <row>
+      <item>01</item>
+      <item>LCP-TEST-001</item>
+      <item>物流模式B</item>                <!-- 不同物流模式 -->
+      <item>004</item>
+      <item>LCP-TEST-001</item>            <!-- item_1: LCP品名 -->
+      <item>分隔符1</item>
+      <item>专线配送</item>
+      <item>分隔符2</item>
+      <item>德邦物流</item>
+      <item>分隔符3</item>
+      <item>深圳</item>
+      <item>分隔符4</item>
+      <item>150</item>
+      <item>分隔符5</item>
+      <item>8</item>
+      <item>分隔符6</item>
+      <item>已送达</item>
+      <item>分隔符7</item>
+      <item>物流员乙</item>
+      <item>分隔符8</item>                 <!-- item_18: 分隔符（会被清理） -->
+    </row>
+    
+  </pattern>
+</trafficParam>

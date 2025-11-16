@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trafficParam>
+  <pattern>
+    <row>
+      <item>02</item>                      <!-- item_0: procConditionGroup -->
+      <item>GP-TEST-001</item>             <!-- item_1: GP品名 -->
+      <item>工程系列A</item>                <!-- item_2: 工程系列（下拉框1） -->
+      <item>大分类001</item>                <!-- item_3: 大分类cd -->
+      <item>中分类N01</item>                <!-- item_4: 中分类cd -->
+      <item>001</item>                     <!-- item_5: 加工条件种cd ✅ -->
+      <item>1111</item>                    <!-- item_6: 品名编号 -->
+      <item>A型</item>                     <!-- item_7: 设备类型（下拉框2） -->
+      <item>A1型</item>                    <!-- item_8: 设备型号（下拉框3） -->
+      <item>V1.0</item>                    <!-- item_9: 设备版本（下拉框4） -->
+      <item>25.5</item>                    <!-- item_10: 温度 -->
+      <item>60</item>                      <!-- item_11: 湿度 -->
+      <item>备用7</item>                   <!-- item_12: 备用字段7 -->
+      <item>备用8</item>                   <!-- item_13: 备用字段8 -->
+      <item>备用9</item>                   <!-- item_14: 备用字段9 -->
+      <item>额外字段A1V1</item>            <!-- item_15: 额外字段（不在下拉框范围） -->
+    </row>
+    
+    <!-- 第2组：A型系列变种，同一下拉框的不同选项 -->
+    <row>
+      <item>02</item>
+      <item>GP-TEST-001</item>
+      <item>工程系列A</item>
+      <item>大分类001</item>
+      <item>中分类N01</item>
+      <item>001</item>
+      <item>1112</item>
+      <item>A型</item>
+      <item>A2型</item>                    <!-- 不同的设备型号 -->
+      <item>V1.0</item>
+      <item>26.0</item>
+      <item>65</item>
+      <item>备用7-2</item>
+      <item>备用8-2</item>
+      <item>备用9-2</item>
+      <item>额外字段A2V1</item>
+    </row>
+    
+    <!-- 第3组：B型系列，测试不同工程系列 -->
+    <row>
+      <item>02</item>
+      <item>GP-TEST-001</item>
+      <item>工程系列B</item>                <!-- 不同的工程系列 -->
+      <item>大分类001</item>
+      <item>中分类N01</item>
+      <item>001</item>
+      <item>2111</item>
+      <item>B型</item>                     <!-- 对应B系列的设备类型 -->
+      <item>B1型</item>                    <!-- B系列设备型号 -->
+      <item>V2.0</item>                    <!-- B系列版本 -->
+      <item>28.0</item>
+      <item>55</item>
+      <item>备用7-B</item>
+      <item>备用8-B</item>
+      <item>备用9-B</item>
+      <item>额外字段B1V2</item>
+    </row>
+    
+    <!-- cd=002: 质检工序 - 单个下拉框 -->
+    <!-- 第1组：质检A工序 -->
+    <row>
+      <item>02</item>
+      <item>GP-TEST-001</item>
+      <item>质检工程A</item>                <!-- item_2: 质检工程（下拉框1） -->
+      <item>大分类001</item>
+      <item>中分类N01</item>
+      <item>002</item>                     <!-- item_5: 加工条件种cd ✅ -->
+      <item>QC001</item>                   <!-- item_6: 质检编号 -->
+      <item>温度检查</item>                 <!-- item_7: 检查类型（无下拉框，直接显示） -->
+      <item>标准工艺</item>                 <!-- item_8: 工艺标准（无下拉框） -->
+      <item>检查完成</item>                 <!-- item_9: 检查状态（无下拉框） -->
+      <item>120.5</item>                   <!-- item_10: 检查温度 -->
+      <item>85.5</item>                    <!-- item_11: 检查速度 -->
+      <item>合格</item>                    <!-- item_12: 检查结果 -->
+      <item>无异常</item>                  <!-- item_13: 异常情况 -->
+      <item>张三</item>                    <!-- item_14: 检查员 -->
+      <item>质检备注002</item>             <!-- item_15: 质检备注 -->
+    </row>
+    
+    <!-- 第2组：质检B工序 -->
+    <row>
+      <item>02</item>
+      <item>GP-TEST-001</item>
+      <item>质检工程B</item>                <!-- 不同的质检工程 -->
+      <item>大分类001</item>
+      <item>中分类N01</item>
+      <item>002</item>
+      <item>QC002</item>
+      <item>压力检查</item>
+      <item>高级工艺</item>
+      <item>检查中</item>
+      <item>125.0</item>
+      <item>90.0</item>
+      <item>待检</item>
+      <item>压力异常</item>
+      <item>李四</item>
+      <item>质检备注002-B</item>
+    </row>
+    
+    <!-- cd=003: 包装工序 - 无下拉框 -->
+    <!-- 所有字段都是直接显示，不需要下拉框选项 -->
+    <row>
+      <item>02</item>
+      <item>GP-TEST-001</item>
+      <item>包装线01</item>                 <!-- item_2: 包装线（无下拉框） -->
+      <item>大分类001</item>
+      <item>中分类N01</item>
+      <item>003</item>                     <!-- item_5: 加工条件种cd ✅ -->
+      <item>PKG001</item>                  <!-- item_6: 包装编号 -->
+      <item>标准包装</item>                 <!-- item_7: 包装类型 -->
+      <item>纸箱包装</item>                 <!-- item_8: 包装材料 -->
+      <item>50</item>                      <!-- item_9: 包装数量 -->
+      <item>5.5</item>                     <!-- item_10: 包装重量 -->
+      <item>完好</item>                    <!-- item_11: 包装状态 -->
+      <item>已贴标</item>                  <!-- item_12: 标签状态 -->
+      <item>王五</item>                    <!-- item_13: 包装员 -->
+      <item>2025-01-15</item>             <!-- item_14: 包装日期 -->
+      <item>包装正常无异常</item>           <!-- item_15: 包装备注 -->
+    </row>
+    
+    <!-- cd=004: 运输工序 - 混合场景（部分有下拉框，部分无） -->
+    <row>
+      <item>02</item>
+      <item>GP-TEST-001</item>
+      <item>运输方式A</item>                <!-- item_2: 运输方式（下拉框） -->
+      <item>大分类001</item>
+      <item>中分类N01</item>
+      <item>004</item>                     <!-- item_5: 加工条件种cd ✅ -->
+      <item>SHIP001</item>                 <!-- item_6: 运输编号 -->
+      <item>陆运</item>                    <!-- item_7: 运输类型（无下拉框） -->
+      <item>货车</item>                    <!-- item_8: 运输工具（无下拉框） -->
+      <item>北京</item>                    <!-- item_9: 目的地（无下拉框） -->
+      <item>500</item>                     <!-- item_10: 运输距离 -->
+      <item>8.5</item>                     <!-- item_11: 预计时间 -->
+      <item>在途</item>                    <!-- item_12: 运输状态 -->
+      <item>正常</item>                    <!-- item_13: 运输情况 -->
+      <item>赵六</item>                    <!-- item_14: 运输员 -->
+      <item>运输顺利</item>                 <!-- item_15: 运输备注 -->
+    </row>
+    
+  </pattern>
+</trafficParam>

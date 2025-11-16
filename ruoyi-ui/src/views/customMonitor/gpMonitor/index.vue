@@ -1,6 +1,6 @@
 <template>
   <common-monitor
-    config-key="gpMonitor"
+    config-key="gpTestComplete"
     monitor-name="GP监控"
     css-prefix="gp"
     :desc-column="4"
@@ -11,7 +11,7 @@
 import CommonMonitor from '../CommonMonitor.vue'
 
 export default {
-  name: 'GpMonitor',
+  name: 'gpTestComplete',
   components: {
     CommonMonitor
   }

@@ -1,6 +1,6 @@
 <template>
   <common-monitor
-    config-key="lcpMonitor"
+    config-key="lcpTestComplete"
     monitor-name="LCP监控"
     css-prefix="lcp"
     :desc-column="4"
@@ -11,7 +11,7 @@
 import CommonMonitor from '../CommonMonitor.vue'
 
 export default {
-  name: 'LcpMonitor',
+  name: 'lcpTestComplete',
   components: {
     CommonMonitor
   }
