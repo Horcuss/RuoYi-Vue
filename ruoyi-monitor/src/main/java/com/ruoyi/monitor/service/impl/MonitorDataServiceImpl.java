@@ -69,6 +69,11 @@ public class MonitorDataServiceImpl implements IMonitorDataService
             log.info("开始构建前端需要的数据类型");
             resultData = MonitorDataProcessor.buildFrontendData(configJson, allData);
             
+            // 处理指示书信息表格数据
+            log.info("开始处理指示书信息表格数据");
+            List<Map<String, Object>> instructionTableData = processInstructionTableData(configJson);
+            resultData.put("instructionTableData", instructionTableData);
+            
         } catch (Exception e) {
             log.error("获取监控数据失败", e);
         }
@@ -200,6 +205,218 @@ public class MonitorDataServiceImpl implements IMonitorDataService
             log.error("请求参数: {}", params);
         }
         return result;
+    }
+
+    /**
+     * 处理指示书信息表格数据
+     * @param configJson 监控配置JSON
+     * @return 指示书信息表格数据列表
+     */
+    private List<Map<String, Object>> processInstructionTableData(JSONObject configJson) {
+        List<Map<String, Object>> tableData = new ArrayList<>();
+        
+        try {
+            // 生成模拟XML字符串（后续替换为实际API调用）
+            String xmlResponse = generateMockInstructionXml();
+            
+            // 解析XML
+            List<List<Map<String, String>>> patterns = parseInstructionXml(xmlResponse);
+            
+            if (patterns.size() < 5) {
+                log.warn("XML格式不正确，pattern数量不足");
+                return tableData;
+            }
+            
+            // Pattern[2]: 指示书主要信息
+            List<Map<String, String>> pattern2 = patterns.get(2);
+            // Pattern[3]: 追加情报
+            List<Map<String, String>> pattern3 = patterns.get(3);
+            // Pattern[4]: Lot信息
+            List<Map<String, String>> pattern4 = patterns.get(4);
+            
+            // 判断是否GP项目
+            String procConditionGroup = configJson.getString("procConditionGroup");
+            boolean isGpProject = "02".equals(procConditionGroup);
+            
+            // 按指示书NO合并数据
+            Map<String, Map<String, Object>> instructionMap = new HashMap<>();
+            
+            // 处理Pattern[2] - 主要信息
+            for (Map<String, String> row : pattern2) {
+                String instructionNo = getItemValue(row, 0);
+                if (StringUtils.isEmpty(instructionNo)) continue;
+                
+                Map<String, Object> instruction = new HashMap<>();
+                instruction.put("instructionNo", instructionNo);
+                instruction.put("issueType", getItemValue(row, 4)); // 发行区分
+                instruction.put("revisionRecord", getItemValue(row, 1)); // 改订记号
+                instruction.put("documentType", getItemValue(row, 2)); // 文书类别名
+                instruction.put("instructionName", getItemValue(row, 3)); // 指示书名
+                instruction.put("mainTextTitle", getItemValue(row, 5)); // 本文标题
+                instruction.put("mainTextBlobId", getItemValue(row, 6)); // 本文文件blobid
+                instruction.put("processingConditionTitle", getItemValue(row, 7)); // 加工条件标题
+                instruction.put("processingConditionBlobId", getItemValue(row, 8)); // 加工条件文件blobid
+                
+                instructionMap.put(instructionNo, instruction);
+            }
+            
+            // 处理Pattern[3] - 追加情报
+            for (Map<String, String> row : pattern3) {
+                String instructionNo = getItemValue(row, 0);
+                if (StringUtils.isEmpty(instructionNo)) continue;
+                
+                Map<String, Object> instruction = instructionMap.get(instructionNo);
+                if (instruction != null) {
+                    instruction.put("additionalInfoTitle", getItemValue(row, 2)); // 追加情报标题
+                    instruction.put("additionalInfoBlobId", getItemValue(row, 3)); // 追加情报文件blobid
+                }
+            }
+            
+            // 处理Pattern[4] - Lot信息
+            for (Map<String, String> row : pattern4) {
+                String instructionNo = getItemValue(row, 0);
+                if (StringUtils.isEmpty(instructionNo)) continue;
+                
+                Map<String, Object> instruction = instructionMap.get(instructionNo);
+                if (instruction != null) {
+                    String lotNo = getItemValue(row, 3);
+                    String productNo = getItemValue(row, 4);
+                    String processSeries = getItemValue(row, 5);
+                    
+                    // 根据项目类型拼接lotInfo
+                    String lotInfo;
+                    if (isGpProject) {
+                        // GP项目：显示 品番・工程系列
+                        lotInfo = (StringUtils.isNotEmpty(productNo) ? productNo : "") + 
+                                  "・" + 
+                                  (StringUtils.isNotEmpty(processSeries) ? processSeries : "");
+                    } else {
+                        // 非GP项目：显示 lot no
+                        lotInfo = StringUtils.isNotEmpty(lotNo) ? lotNo : "";
+                    }
+                    
+                    instruction.put("lotInfo", lotInfo);
+                    instruction.put("middleClassName", getItemValue(row, 6)); // 中分类名
+                    instruction.put("comment", getItemValue(row, 7)); // comment
+                }
+            }
+            
+            // 转换为列表
+            tableData.addAll(instructionMap.values());
+            
+            log.info("指示书信息表格数据处理完成，共{}条", tableData.size());
+            
+        } catch (Exception e) {
+            log.error("处理指示书信息表格数据失败", e);
+        }
+        
+        return tableData;
+    }
+    
+    /**
+     * 生成模拟的指示书XML数据
+     */
+    private String generateMockInstructionXml() {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n" +
+               "<trafficParam>\n" +
+               "  <pattern><row><item>02</item></row></pattern>\n" +
+               "  <pattern><row><item>02</item></row></pattern>\n" +
+               "  <pattern>\n" +
+               "    <row>\n" +
+               "      <item>INS-001</item>\n" +
+               "      <item>Rev1</item>\n" +
+               "      <item>加工指示书</item>\n" +
+               "      <item>GP加工指示</item>\n" +
+               "      <item>1</item>\n" +
+               "      <item>本文标题1</item>\n" +
+               "      <item>blob_main_001</item>\n" +
+               "      <item>加工条件标题1</item>\n" +
+               "      <item>blob_proc_001</item>\n" +
+               "    </row>\n" +
+               "  </pattern>\n" +
+               "  <pattern>\n" +
+               "    <row>\n" +
+               "      <item>INS-001</item>\n" +
+               "      <item></item>\n" +
+               "      <item>追加情报标题1</item>\n" +
+               "      <item>blob_add_001</item>\n" +
+               "    </row>\n" +
+               "  </pattern>\n" +
+               "  <pattern>\n" +
+               "    <row>\n" +
+               "      <item>INS-001</item>\n" +
+               "      <item>001</item>\n" +
+               "      <item>N01</item>\n" +
+               "      <item>LOT-12345</item>\n" +
+               "      <item>PROD-A</item>\n" +
+               "      <item>Series-X</item>\n" +
+               "      <item>GP中分类</item>\n" +
+               "      <item></item>\n" +
+               "    </row>\n" +
+               "  </pattern>\n" +
+               "  <result>1</result>\n" +
+               "  <resultMessage/>\n" +
+               "  <resultMessageId/>\n" +
+               "</trafficParam>";
+    }
+    
+    /**
+     * 解析指示书XML
+     * @param xmlString XML字符串
+     * @return Pattern列表，每个Pattern包含多个row
+     */
+    private List<List<Map<String, String>>> parseInstructionXml(String xmlString) {
+        List<List<Map<String, String>>> patterns = new ArrayList<>();
+        if(StringUtils.isEmpty(xmlString)){
+            return patterns;
+        }
+        
+        try {
+            // 简单的XML解析（使用正则表达式）
+            String[] patternBlocks = xmlString.split("<pattern>");
+            
+            for (String block : patternBlocks) {
+                if (!block.contains("<row>")) continue;
+                
+                List<Map<String, String>> patternRows = new ArrayList<>();
+                String[] rows = block.split("<row>");
+                
+                for (String row : rows) {
+                    if (!row.contains("<item>")) continue;
+                    
+                    Map<String, String> rowData = new HashMap<>();
+                    String[] items = row.split("<item>");
+                    
+                    int itemIndex = 0;
+                    for (String item : items) {
+                        if (!item.contains("</item>")) continue;
+                        
+                        String value = item.substring(0, item.indexOf("</item>")).trim();
+                        rowData.put("item_" + itemIndex, value);
+                        itemIndex++;
+                    }
+                    
+                    if (!rowData.isEmpty()) {
+                        patternRows.add(rowData);
+                    }
+                }
+                
+                patterns.add(patternRows);
+            }
+            
+        } catch (Exception e) {
+            log.error("解析指示书XML失败", e);
+        }
+        
+        return patterns;
+    }
+    
+    /**
+     * 获取item值
+     */
+    private String getItemValue(Map<String, String> row, int index) {
+        String value = row.get("item_" + index);
+        return value != null ? value.trim() : "";
     }
 }
 

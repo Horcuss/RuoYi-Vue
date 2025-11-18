@@ -44,6 +44,9 @@
         </el-row>
       </div>
 
+      <!-- 指示书信息表格 -->
+      <instruction-table :table-data="instructionTableData" :is-gp-project="isGpProject"></instruction-table>
+
       <!-- 对话框 -->
       <el-dialog :visible.sync="visible" width="400px" title="提交">
         是否确认提交？{{ formData || "no data" }}
@@ -91,6 +94,9 @@
           </el-row>
         </div>
 
+        <!-- 指示书信息表格 -->
+        <instruction-table :table-data="instructionTableData" :is-gp-project="isGpProject"></instruction-table>
+
         <!-- 对话框 -->
         <el-dialog :visible.sync="visible" width="400px" title="提交">
           是否确认提交？{{ formData || "no data" }}
@@ -106,13 +112,15 @@
 
 <script>
 import CmGrid from '@/components/CompassMonitor/CmGrid/index.js'
+import InstructionTable from '@/components/CompassMonitor/InstructionTable/index.vue'
 import { getConfigByKey } from "@/api/monitor/config";
 import { getMonitorDataWithParams, getSelectOptions } from "@/api/monitor/data";
 
 export default {
   name: 'CommonMonitor',
   components: {
-    CmGrid
+    CmGrid,
+    InstructionTable
   },
   props: {
     // 监控配置KEY（必填）
@@ -150,7 +158,9 @@ export default {
       headerData: [[]],
       infoData: [[]],
       remarks: [],
-      tables: []
+      tables: [],
+      instructionTableData: [],  // 指示书信息表格数据
+      isGpProject: false  // 是否GP项目
     };
   },
   created() {
@@ -177,6 +187,8 @@ export default {
       getConfigByKey(this.configKey).then(response => {
         if (response.data && response.data.configJson) {
           this.config = JSON.parse(response.data.configJson);
+          // 判断是否GP项目（procConditionGroup为02表示GP项目）
+          this.isGpProject = this.config.procConditionGroup === '02';
           this.buildMonitorUI();
         }
         this.loading = false;
@@ -501,6 +513,11 @@ export default {
             }));
           }
         });
+      }
+
+      // 更新指示书信息表格数据
+      if (data.instructionTableData) {
+        this.instructionTableData = data.instructionTableData;
       }
     },
 

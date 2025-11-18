@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>表头示例</title>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", sans-serif;
+      padding: 24px;
+      background: #f7f7f7;
+    }
+    table.doc-header {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 1200px;
+      background: #fff;
+    }
+    .doc-header th,
+    .doc-header td {
+      border: 1px solid #111;
+      text-align: center;
+      padding: 8px 6px;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+    .doc-header thead tr:first-child th {
+      background: #f0f0f0;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <table class="doc-header">
+    <thead>
+      <tr>
+        <th rowspan="2">发行区分</th>
+        <th rowspan="2">指示书NO</th>
+        <th>改订记录</th>
+        <th>文件类别名</th>
+        <th colspan="2">指示书名</th>
+        <th>本文</th>
+        <th>加工条件</th>
+        <th>追加情报</th>
+      </tr>
+      <tr>
+        <td colspan="2">lot no／品番・工程系列</td>
+        <td colspan="1">中分类名</td>
+        <td colspan="4">comment</td>
+      </tr>
+    </thead>
+  </table>
+</body>
+</html>
