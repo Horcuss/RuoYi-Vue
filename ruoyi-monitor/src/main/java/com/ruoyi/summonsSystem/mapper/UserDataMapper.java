@@ -1,4 +1,4 @@
-package com.ruoyi.monitor.mapper;
+package com.ruoyi.summonsSystem.mapper;
 
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.enums.DataSourceType;

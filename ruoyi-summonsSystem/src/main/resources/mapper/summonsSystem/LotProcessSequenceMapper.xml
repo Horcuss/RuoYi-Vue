@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.summonsSystem.mapper.LotProcessSequenceMapper">
+
+    <resultMap type="com.ruoyi.summonsSystem.vo.LotProcessSequence" id="LotProcessSequenceResult">
+        <result property="id"            column="id" />
+        <result property="lotNo"         column="lot_no" />
+        <result property="processCode"   column="process_code" />
+        <result property="processName"   column="process_name" />
+        <result property="seq"           column="seq" />
+        <result property="processSource" column="process_source" />
+        <result property="createTime"    column="create_time" />
+    </resultMap>
+
+    <select id="selectByLotNo" parameterType="String" resultMap="LotProcessSequenceResult">
+        select id, lot_no, process_code, process_name, seq, process_source, create_time
+        from ticket_lot_process_sequence
+        where lot_no = #{lotNo}
+        order by seq asc
+    </select>
+
+    <select id="selectByLotNoAndSeq" resultMap="LotProcessSequenceResult">
+        select id, lot_no, process_code, process_name, seq, process_source, create_time
+        from ticket_lot_process_sequence
+        where lot_no = #{lotNo} and seq = #{seq}
+    </select>
+
+    <select id="selectByLotNoAndProcessCode" resultMap="LotProcessSequenceResult">
+        select id, lot_no, process_code, process_name, seq, process_source, create_time
+        from ticket_lot_process_sequence
+        where lot_no = #{lotNo} and process_code = #{processCode}
+    </select>
+
+    <delete id="deleteByLotNo" parameterType="String">
+        delete from ticket_lot_process_sequence where lot_no = #{lotNo}
+    </delete>
+
+    <insert id="batchInsert">
+        insert into ticket_lot_process_sequence (lot_no, process_code, process_name, seq, process_source, create_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.lotNo}, #{item.processCode}, #{item.processName}, #{item.seq}, #{item.processSource}, now())
+        </foreach>
+    </insert>
+
+</mapper>

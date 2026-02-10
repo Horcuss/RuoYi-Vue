@@ -1,4 +1,4 @@
-package com.ruoyi.monitor.utils;
+package com.ruoyi.summonsSystem.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.utils.StringUtils;

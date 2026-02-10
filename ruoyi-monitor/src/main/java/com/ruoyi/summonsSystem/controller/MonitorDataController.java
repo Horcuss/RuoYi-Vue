@@ -1,8 +1,8 @@
-package com.ruoyi.monitor.controller;
+package com.ruoyi.summonsSystem.controller;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.monitor.service.IMonitorDataService;
+import com.ruoyi.summonsSystem.service.IMonitorDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -74,6 +74,12 @@
             <version>21.1.0.0</version>
         </dependency>
 
+        <!-- 传票系统模块-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-summonsSystem</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

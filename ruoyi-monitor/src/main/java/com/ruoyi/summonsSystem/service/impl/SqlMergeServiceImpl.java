@@ -1,7 +1,7 @@
-package com.ruoyi.monitor.service.impl;
+package com.ruoyi.summonsSystem.service.impl;
 
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.monitor.service.ISqlMergeService;
+import com.ruoyi.summonsSystem.service.ISqlMergeService;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.monitor.mapper.MonitorConfigMapper">
+<mapper namespace="com.ruoyi.summonsSystem.mapper.MonitorConfigMapper">
 
-    <resultMap type="com.ruoyi.monitor.domain.MonitorConfig" id="MonitorConfigResult">
+    <resultMap type="com.ruoyi.summonsSystem.vo.MonitorConfig" id="MonitorConfigResult">
         <result property="configId"     column="config_id"     />
         <result property="configKey"    column="config_key"    />
         <result property="configName"   column="config_name"   />
@@ -37,7 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <!-- 查询监控配置列表 -->
-    <select id="selectList" parameterType="com.ruoyi.monitor.domain.MonitorConfig" resultMap="MonitorConfigResult">
+    <select id="selectList" parameterType="com.ruoyi.summonsSystem.vo.MonitorConfig" resultMap="MonitorConfigResult">
         <include refid="selectMonitorConfigVo"/>
         <where>
             del_flag = '0'
@@ -55,7 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <!-- 新增监控配置 -->
-    <insert id="insert" parameterType="com.ruoyi.monitor.domain.MonitorConfig" useGeneratedKeys="true" keyProperty="configId">
+    <insert id="insert" parameterType="com.ruoyi.summonsSystem.vo.MonitorConfig" useGeneratedKeys="true" keyProperty="configId">
         insert into monitor_config
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="configKey != null and configKey != ''">config_key,</if>
@@ -80,7 +80,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
     <!-- 修改监控配置 -->
-    <update id="updateById" parameterType="com.ruoyi.monitor.domain.MonitorConfig">
+    <update id="updateById" parameterType="com.ruoyi.summonsSystem.vo.MonitorConfig">
         update monitor_config
         <trim prefix="SET" suffixOverrides=",">
             <if test="configKey != null and configKey != ''">config_key = #{configKey},</if>

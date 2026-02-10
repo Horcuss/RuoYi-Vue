@@ -1,4 +1,4 @@
-package com.ruoyi.monitor.controller;
+package com.ruoyi.summonsSystem.controller;
 
 import java.util.List;
 
@@ -16,8 +16,8 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.monitor.domain.MonitorConfig;
-import com.ruoyi.monitor.service.IMonitorConfigService;
+import com.ruoyi.summonsSystem.vo.MonitorConfig;
+import com.ruoyi.summonsSystem.service.IMonitorConfigService;
 import com.ruoyi.common.core.page.TableDataInfo;
 
 /**

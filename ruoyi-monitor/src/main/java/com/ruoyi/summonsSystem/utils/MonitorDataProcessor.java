@@ -1,4 +1,4 @@
-package com.ruoyi.monitor.utils;
+package com.ruoyi.summonsSystem.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.utils.StringUtils;
@@ -408,7 +408,7 @@ public class MonitorDataProcessor {
      * 从API获取数据
      */
     public static Map<String, Object> getApiData(String configKey, JSONObject configJson, Map<String, Object> params,
-                                                com.ruoyi.monitor.cache.XmlDataCache xmlDataCache) {
+                                                com.ruoyi.summonsSystem.cache.XmlDataCache xmlDataCache) {
         Map<String, Object> apiData = new HashMap<>();
 
         try {
@@ -461,9 +461,9 @@ public class MonitorDataProcessor {
 
                 String xmlRequest;
                 if ("02".equals(group)) {
-                    xmlRequest = com.ruoyi.monitor.utils.XmlParser.buildGpXmlRequest(params);
+                    xmlRequest = com.ruoyi.summonsSystem.utils.XmlParser.buildGpXmlRequest(params);
                 } else {
-                    xmlRequest = com.ruoyi.monitor.utils.XmlParser.buildNonGpXmlRequest(params);
+                    xmlRequest = com.ruoyi.summonsSystem.utils.XmlParser.buildNonGpXmlRequest(params);
                 }
 
                 log.info("XML请求体: {}", xmlRequest);
@@ -477,7 +477,7 @@ public class MonitorDataProcessor {
                 // 解析并缓存结果（重要：缓存清理后的数据）
                 String xmlResponse = response.getBody();
                 if (xmlResponse != null && xmlResponse.trim().startsWith("<?xml")) {
-                    List<Map<String, String>> xmlRows = com.ruoyi.monitor.utils.XmlParser.parseXmlResponse(xmlResponse);
+                    List<Map<String, String>> xmlRows = com.ruoyi.summonsSystem.utils.XmlParser.parseXmlResponse(xmlResponse);
                     
                     // 清理XML数据后再缓存（避免缓存原始数据覆盖已清理的数据）
                     MonitorConfigUtil.ProjectConfig projectConfig = new MonitorConfigUtil.ProjectConfig(group);
@@ -665,7 +665,7 @@ public class MonitorDataProcessor {
         log.info("开始从XML响应中提取数据");
 
         // 1. 解析XML
-        List<Map<String, String>> xmlRows = com.ruoyi.monitor.utils.XmlParser.parseXmlResponse(xmlResponse);
+        List<Map<String, String>> xmlRows = com.ruoyi.summonsSystem.utils.XmlParser.parseXmlResponse(xmlResponse);
         log.info("解析XML，共 {} 个row", xmlRows.size());
 
         // 2. 清理XML数据（非GP项目需要移除分隔符）
@@ -861,7 +861,7 @@ public class MonitorDataProcessor {
      * 从数据库获取数据
      */
     public static Map<String, Object> getDatabaseData(JSONObject configJson, Map<String, Object> params,
-                                                     com.ruoyi.monitor.service.ISqlMergeService sqlMergeService) {
+                                                     com.ruoyi.summonsSystem.service.ISqlMergeService sqlMergeService) {
         Map<String, Object> dbData = new HashMap<>();
         List<String> sqlList = new ArrayList<>();
         // 用于建立 SQL -> valueKey 的映射关系

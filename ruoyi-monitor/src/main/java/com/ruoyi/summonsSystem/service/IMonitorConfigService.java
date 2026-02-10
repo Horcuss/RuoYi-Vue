@@ -1,7 +1,7 @@
-package com.ruoyi.monitor.service;
+package com.ruoyi.summonsSystem.service;
 
 import java.util.List;
-import com.ruoyi.monitor.domain.MonitorConfig;
+import com.ruoyi.summonsSystem.vo.MonitorConfig;
 
 /**
  * 监控配置Service接口

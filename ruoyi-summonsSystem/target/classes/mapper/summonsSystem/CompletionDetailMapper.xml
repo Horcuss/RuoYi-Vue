@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.summonsSystem.mapper.CompletionDetailMapper">
+
+    <resultMap type="com.ruoyi.summonsSystem.vo.CompletionDetail" id="CompletionDetailResult">
+        <result property="lotNo"           column="lot_no" />
+        <result property="processCode"     column="process_code" />
+        <result property="processName"     column="process_name" />
+        <result property="workDate"        column="work_date" />
+        <result property="worker"          column="worker" />
+        <result property="completionCount" column="completion_count" />
+        <result property="quantity"        column="quantity" />
+        <result property="deviceNo"        column="device_no" />
+        <result property="filmRollNo"      column="film_roll_no" />
+        <result property="defectInfo"      column="defect_info" />
+        <result property="createTime"      column="create_time" />
+        <result property="updateTime"      column="update_time" />
+    </resultMap>
+
+    <select id="selectByLotAndProcess" resultMap="CompletionDetailResult">
+        select lot_no, process_code, process_name, work_date, worker, completion_count,
+               quantity, device_no, film_roll_no, defect_info, create_time, update_time
+        from ticket_completion_detail
+        where lot_no = #{lotNo} and process_code = #{processCode}
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.summonsSystem.vo.CompletionDetail">
+        insert into ticket_completion_detail
+        (lot_no, process_code, process_name, work_date, worker, completion_count,
+         quantity, device_no, film_roll_no, defect_info, create_time)
+        values
+        (#{lotNo}, #{processCode}, #{processName}, #{workDate}, #{worker}, #{completionCount},
+         #{quantity}, #{deviceNo}, #{filmRollNo}, #{defectInfo}, now())
+        ON DUPLICATE KEY UPDATE
+            process_name = #{processName},
+            work_date = #{workDate},
+            worker = #{worker},
+            completion_count = #{completionCount},
+            quantity = #{quantity},
+            device_no = #{deviceNo},
+            film_roll_no = #{filmRollNo},
+            defect_info = #{defectInfo},
+            update_time = now()
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.summonsSystem.vo.CompletionDetail">
+        update ticket_completion_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="processName != null">process_name = #{processName},</if>
+            <if test="workDate != null">work_date = #{workDate},</if>
+            <if test="worker != null">worker = #{worker},</if>
+            <if test="completionCount != null">completion_count = #{completionCount},</if>
+            quantity = #{quantity},
+            device_no = #{deviceNo},
+            film_roll_no = #{filmRollNo},
+            defect_info = #{defectInfo},
+            update_time = now(),
+        </trim>
+        where lot_no = #{lotNo} and process_code = #{processCode}
+    </update>
+
+</mapper>

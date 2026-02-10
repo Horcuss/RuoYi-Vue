@@ -12,6 +12,7 @@
         <module name="ruoyi-generator" />
         <module name="ruoyi-monitor" />
         <module name="ruoyi-quartz" />
+        <module name="ruoyi-summonsSystem" />
         <module name="ruoyi-admin" />
       </profile>
     </annotationProcessing>

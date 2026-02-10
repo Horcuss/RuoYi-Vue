@@ -1,4 +1,4 @@
-package com.ruoyi.monitor.service.impl;
+package com.ruoyi.summonsSystem.service.impl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.monitor.mapper.MonitorConfigMapper;
-import com.ruoyi.monitor.domain.MonitorConfig;
-import com.ruoyi.monitor.service.IMonitorConfigService;
+import com.ruoyi.summonsSystem.mapper.MonitorConfigMapper;
+import com.ruoyi.summonsSystem.vo.MonitorConfig;
+import com.ruoyi.summonsSystem.service.IMonitorConfigService;
 
 /**
  * 监控配置Service业务层处理

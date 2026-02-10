@@ -114,6 +114,8 @@ public class SecurityConfig
                 requests.antMatchers("/login", "/register", "/captchaImage").permitAll()
                     // XML测试API允许匿名访问
                     .antMatchers("/api/xmltest/**").permitAll()
+                    // 传票系统API和WebSocket允许匿名访问
+                    .antMatchers("/api/ticket/**", "/ws/sensor").permitAll()
                     // 静态资源，可匿名访问
                     .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
                     .antMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs", "/druid/**").permitAll()

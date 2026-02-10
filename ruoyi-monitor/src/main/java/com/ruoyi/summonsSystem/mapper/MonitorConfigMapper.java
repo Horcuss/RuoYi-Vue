@@ -1,8 +1,8 @@
-package com.ruoyi.monitor.mapper;
+package com.ruoyi.summonsSystem.mapper;
 
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.enums.DataSourceType;
-import com.ruoyi.monitor.domain.MonitorConfig;
+import com.ruoyi.summonsSystem.vo.MonitorConfig;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

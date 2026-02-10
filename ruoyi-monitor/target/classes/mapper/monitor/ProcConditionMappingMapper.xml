@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.monitor.mapper.ProcConditionMappingMapper">
+<mapper namespace="com.ruoyi.summonsSystem.mapper.ProcConditionMappingMapper">
 
-    <resultMap type="com.ruoyi.monitor.domain.ProcConditionMapping" id="ProcConditionMappingResult">
+    <resultMap type="com.ruoyi.summonsSystem.vo.ProcConditionMapping" id="ProcConditionMappingResult">
         <result property="id"                    column="id"                      />
         <result property="procConditionGroup"    column="proc_condition_group"    />
         <result property="majorClassCd"          column="major_class_cd"          />
@@ -51,7 +51,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
     <!-- 查询列表 -->
-    <select id="selectList" parameterType="com.ruoyi.monitor.domain.ProcConditionMapping" resultMap="ProcConditionMappingResult">
+    <select id="selectList" parameterType="com.ruoyi.summonsSystem.vo.ProcConditionMapping" resultMap="ProcConditionMappingResult">
         <include refid="selectProcConditionMappingVo"/>
         <where>
             <if test="procConditionGroup != null and procConditionGroup != ''">
@@ -84,7 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <!-- 新增 -->
-    <insert id="insert" parameterType="com.ruoyi.monitor.domain.ProcConditionMapping" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="com.ruoyi.summonsSystem.vo.ProcConditionMapping" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO proc_condition_mapping
         (proc_condition_group, major_class_cd, minor_class_cd,
          proc_condition_type_cd, multi_key_type, proc_condition_seq, condition_name)
@@ -94,7 +94,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
     <!-- 修改 -->
-    <update id="updateById" parameterType="com.ruoyi.monitor.domain.ProcConditionMapping">
+    <update id="updateById" parameterType="com.ruoyi.summonsSystem.vo.ProcConditionMapping">
         UPDATE proc_condition_mapping
         <set>
             <if test="procConditionGroup != null and procConditionGroup != ''">proc_condition_group = #{procConditionGroup},</if>

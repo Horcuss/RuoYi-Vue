@@ -1,8 +1,8 @@
-package com.ruoyi.monitor.mapper;
+package com.ruoyi.summonsSystem.mapper;
 
 import com.ruoyi.common.annotation.DataSource;
 import com.ruoyi.common.enums.DataSourceType;
-import com.ruoyi.monitor.domain.ProcConditionMapping;
+import com.ruoyi.summonsSystem.vo.ProcConditionMapping;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

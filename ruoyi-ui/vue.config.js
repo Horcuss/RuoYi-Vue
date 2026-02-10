@@ -48,6 +48,12 @@ module.exports = {
           ['^' + process.env.VUE_APP_BASE_API]: ''
         }
       },
+      // WebSocket proxy
+      '/ws': {
+        target: baseUrl,
+        changeOrigin: true,
+        ws: true
+      },
       // springdoc proxy
       '^/v3/api-docs/(.*)': {
         target: baseUrl,

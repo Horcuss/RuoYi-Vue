@@ -1,4 +1,4 @@
-package com.ruoyi.monitor.controller;
+package com.ruoyi.summonsSystem.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

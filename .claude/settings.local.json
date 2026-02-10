@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(mvn compile:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(test:*)",
+      "WebSearch",
+      "Bash(del \"C:\\\\Users\\\\Administrator\\\\Desktop\\\\撸猫项目\\\\RuoYi-Vue\\\\sql\\\\ticket_flow_config.sql\")",
+      "Bash(del \"C:\\\\Users\\\\Administrator\\\\Desktop\\\\撸猫项目\\\\RuoYi-Vue\\\\ruoyi-summonsSystem\\\\src\\\\main\\\\java\\\\com\\\\ruoyi\\\\summonsSystem\\\\mapper\\\\FlowConfigMapper.java\")",
+      "Bash(del \"C:\\\\Users\\\\Administrator\\\\Desktop\\\\撸猫项目\\\\RuoYi-Vue\\\\ruoyi-summonsSystem\\\\src\\\\main\\\\resources\\\\mapper\\\\summonsSystem\\\\FlowConfigMapper.xml\")",
+      "Bash(dir:*)",
+      "Bash(where:*)",
+      "Bash(cmd /c \"where mvn.cmd 2>nul & where mvn 2>nul & dir /b C:\\\\*maven* 2>nul & dir /b D:\\\\*maven* 2>nul\")",
+      "Bash(cmd /c \"dir /s /b \"C:UsersAdministratorDesktop撸猫项目RuoYi-Vuenul\" 2>nul\")",
+      "Bash(cmd /c \"where /r \"C:UsersAdministratorDesktop撸猫项目RuoYi-Vue\" nul 2>nul\")",
+      "Bash(cmd /c \"del \\\\?\\\\C:\\\\Users\\\\Administrator\\\\Desktop\\\\撸猫项目\\\\RuoYi-Vue\\\\nul\")",
+      "Bash(cmd /c \"del /f \"\\\\?C:UsersAdministratorDesktop撸猫项目RuoYi-Vuenul\"\")"
+    ]
+  }
+}

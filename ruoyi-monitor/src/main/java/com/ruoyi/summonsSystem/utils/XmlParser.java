@@ -1,4 +1,4 @@
-package com.ruoyi.monitor.utils;
+package com.ruoyi.summonsSystem.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

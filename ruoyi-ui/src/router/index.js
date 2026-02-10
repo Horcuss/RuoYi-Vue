@@ -87,6 +87,39 @@ export const constantRoutes = [
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
+  },
+  {
+    path: '/summonsSystem',
+    component: Layout,
+    redirect: 'noRedirect',
+    name: 'SummonsSystem',
+    meta: { title: '传票系统', icon: 'documentation' },
+    children: [
+      {
+        path: 'einkBind',
+        component: () => import('@/views/summonsSystem/einkBind/index'),
+        name: 'EinkBind',
+        meta: { title: '水墨屏绑定', icon: 'link' }
+      },
+      {
+        path: 'completion',
+        component: () => import('@/views/summonsSystem/completion/index'),
+        name: 'Completion',
+        meta: { title: '完了输机', icon: 'edit' }
+      },
+      {
+        path: 'defect',
+        component: () => import('@/views/summonsSystem/defect/index'),
+        name: 'Defect',
+        meta: { title: '不良入力', icon: 'bug' }
+      },
+      {
+        path: 'flowTest',
+        component: () => import('@/views/summonsSystem/flowTest/index'),
+        name: 'FlowTest',
+        meta: { title: '流转测试', icon: 'skill' }
+      }
+    ]
   }
 ]
 
