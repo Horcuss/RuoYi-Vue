@@ -109,7 +109,9 @@ public class EinkBindServiceImpl implements IEinkBindService
         binding.setLotNo(lotNo);
         rfidLotBindingMapper.insert(binding);
 
-        // 8. 初始化/更新lot流转状态
+        // 8. 初始化/更新lot流转状态（重复绑定时先删旧状态再插入）
+        lotFlowStatusMapper.deleteByLotNo(lotNo);
+
         int seq = 1;
         LotProcessSequence currentSeqRecord = lotProcessSequenceMapper.selectByLotNoAndProcessCode(lotNo, processCode);
         if (currentSeqRecord != null)
